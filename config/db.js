@@ -15,6 +15,12 @@ export default async function connectDB() {
     console.log("MongoDB Atlas kapcsolat sikeres.");
   } catch (err) {
     console.error("MongoDB kapcsolodasi hiba:", err.message);
-    process.exit(1);
+    // Vercel-en (szerverless fuggvenyben) a process.exit egy elo, meleg
+    // fuggveny-peldanyt is megolne mas kerelmek kozepen - ott a kapcsolodasi
+    // hiba egyszeruen naplozodik, es az egyes vegpontok sajat try/catch-e
+    // kezeli a hibat.
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 }

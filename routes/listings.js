@@ -60,6 +60,7 @@ router.get("/", async (req, res) => {
     cacheSet(LIST_CACHE_KEY, listings, LIST_CACHE_TTL);
     res.json(listings);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Hiba az ingatlanok lekeresekor." });
   }
 });
@@ -81,6 +82,7 @@ router.get("/:id", async (req, res) => {
     cacheSet(key, listing, ITEM_CACHE_TTL);
     res.json(listing);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Hiba az ingatlan lekeresekor." });
   }
 });
@@ -158,6 +160,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
     cacheDel(LIST_CACHE_KEY, itemCacheKey(req.params.id));
     res.json({ message: "Ingatlan torolve." });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Hiba az ingatlan torlesekor." });
   }
 });
