@@ -1,0 +1,275 @@
+import { useEffect, useRef, useState } from "react";
+
+const emptyForm = {
+  title: "",
+  type: "Eladó",
+  category: "Lakás",
+  price: "",
+  city: "",
+  address: "",
+  size: "",
+  rooms: "",
+  description: "",
+  featured: false,
+};
+
+export default function AdminListingForm({ initial, onSubmit, onCancel, submitting }) {
+  const [form, setForm] = useState(() =>
+    initial
+      ? {
+          title: initial.title || "",
+          type: initial.type || "Eladó",
+          category: initial.category || "Lakás",
+          price: initial.price ?? "",
+          city: initial.city || "",
+          address: initial.address || "",
+          size: initial.size ?? "",
+          rooms: initial.rooms ?? "",
+          description: initial.description || "",
+          featured: !!initial.featured,
+        }
+      : emptyForm
+  );
+
+  const [existingImages, setExistingImages] = useState(initial?.images || []);
+  const [newFiles, setNewFiles] = useState([]);
+  const [newPreviews, setNewPreviews] = useState([]);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      newPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleChange(e) {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  }
+
+  function handleFilesSelected(e) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setNewFiles((prev) => [...prev, ...files]);
+    setNewPreviews((prev) => [...prev, ...files.map((file) => URL.createObjectURL(file))]);
+    e.target.value = "";
+  }
+
+  function removeExistingImage(url) {
+    setExistingImages((prev) => prev.filter((img) => img !== url));
+  }
+
+  function removeNewImage(index) {
+    setNewPreviews((prev) => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("type", form.type);
+    formData.append("category", form.category);
+    formData.append("price", String(Number(form.price) || 0));
+    formData.append("city", form.city);
+    formData.append("address", form.address);
+    formData.append("size", String(Number(form.size) || 0));
+    formData.append("rooms", String(Number(form.rooms) || 0));
+    formData.append("description", form.description);
+    formData.append("featured", String(form.featured));
+    formData.append("existingImages", JSON.stringify(existingImages));
+    newFiles.forEach((file) => formData.append("images", file));
+
+    onSubmit(formData);
+  }
+
+  return (
+    <form className="admin-form" onSubmit={handleSubmit}>
+      <div className="admin-form-grid">
+        <div className="field">
+          <label htmlFor="af-title">Cím *</label>
+          <input
+            id="af-title"
+            name="title"
+            type="text"
+            required
+            value={form.title}
+            onChange={handleChange}
+            placeholder="Pl. Napfényes családi ház a Rózsadombon"
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-type">Típus</label>
+          <select id="af-type" name="type" value={form.type} onChange={handleChange}>
+            <option value="Eladó">Eladó</option>
+            <option value="Kiadó">Kiadó</option>
+          </select>
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-category">Kategória</label>
+          <select id="af-category" name="category" value={form.category} onChange={handleChange}>
+            <option value="Lakás">Lakás</option>
+            <option value="Ház">Ház</option>
+            <option value="Telek">Telek</option>
+            <option value="Iroda">Iroda</option>
+            <option value="Nyaraló">Nyaraló</option>
+          </select>
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-price">Ár (Ft) *</label>
+          <input
+            id="af-price"
+            name="price"
+            type="number"
+            min="0"
+            required
+            value={form.price}
+            onChange={handleChange}
+            placeholder="Pl. 55000000"
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-city">Település *</label>
+          <input
+            id="af-city"
+            name="city"
+            type="text"
+            required
+            value={form.city}
+            onChange={handleChange}
+            placeholder="Pl. Budapest"
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-address">Cím / utca</label>
+          <input
+            id="af-address"
+            name="address"
+            type="text"
+            value={form.address}
+            onChange={handleChange}
+            placeholder="Pl. Fő utca 12."
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-size">Alapterület (m²)</label>
+          <input
+            id="af-size"
+            name="size"
+            type="number"
+            min="0"
+            value={form.size}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="af-rooms">Szobák száma</label>
+          <input
+            id="af-rooms"
+            name="rooms"
+            type="number"
+            min="0"
+            value={form.rooms}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="field admin-form-span">
+          <label>Fényképek</label>
+
+          {(existingImages.length > 0 || newPreviews.length > 0) && (
+            <div className="admin-image-grid">
+              {existingImages.map((url) => (
+                <div className="admin-image-thumb" key={url}>
+                  <img src={url} alt="" />
+                  <button
+                    type="button"
+                    className="admin-image-remove"
+                    onClick={() => removeExistingImage(url)}
+                    aria-label="Kép eltávolítása"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {newPreviews.map((url, index) => (
+                <div className="admin-image-thumb" key={url}>
+                  <img src={url} alt="" />
+                  <button
+                    type="button"
+                    className="admin-image-remove"
+                    onClick={() => removeNewImage(index)}
+                    aria-label="Kép eltávolítása"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFilesSelected}
+            hidden
+          />
+          <button
+            type="button"
+            className="btn btn-outline btn-small"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            + Fényképek hozzáadása
+          </button>
+        </div>
+
+        <div className="field admin-form-span">
+          <label htmlFor="af-description">Leírás</label>
+          <textarea
+            id="af-description"
+            name="description"
+            rows={4}
+            value={form.description}
+            onChange={handleChange}
+          />
+        </div>
+
+        <label className="admin-checkbox admin-form-span">
+          <input
+            type="checkbox"
+            name="featured"
+            checked={form.featured}
+            onChange={handleChange}
+          />
+          Kiemelt ingatlan a főoldalon
+        </label>
+      </div>
+
+      <div className="admin-form-actions">
+        <button type="button" className="btn btn-outline" onClick={onCancel}>
+          Mégse
+        </button>
+        <button type="submit" className="btn btn-primary" disabled={submitting}>
+          {submitting ? "Mentés…" : "Mentés"}
+        </button>
+      </div>
+    </form>
+  );
+}
