@@ -74,6 +74,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <span>© {year} Szilva Ingatlan Kft. Minden jog fenntartva.</span>
+          <Link to="/adatvedelem">Adatvédelmi tájékoztató</Link>
         </div>
       </div>
     </footer>

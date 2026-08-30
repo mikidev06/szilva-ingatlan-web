@@ -842,6 +842,50 @@ button {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.footer-bottom a {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.footer-bottom a:hover {
+  color: #fff;
+}
+
+/* Legal / hosszú szöveges oldalak (pl. adatvédelmi tájékoztató) */
+
+.legal-content {
+  max-width: 760px;
+}
+
+.legal-content h2 {
+  font-size: 1.15rem;
+  margin: 32px 0 12px;
+}
+
+.legal-content h2:first-child {
+  margin-top: 0;
+}
+
+.legal-content p {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.legal-content ul {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.legal-content li {
+  margin-bottom: 6px;
+}
+
+.legal-content a {
+  color: var(--color-primary-dark);
+}
+
 /* Page header (for inner pages) */
 
 .page-header {

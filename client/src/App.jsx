@@ -7,6 +7,7 @@ import ListingDetail from "./pages/ListingDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
+import Privacy from "./pages/Privacy";
 import Admin from "./pages/Admin";
 
 function PublicLayout() {
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/rolam" element={<About />} />
         <Route path="/idopontfoglalas" element={<Booking />} />
         <Route path="/kapcsolat" element={<Contact />} />
+        <Route path="/adatvedelem" element={<Privacy />} />
       </Route>
       <Route path="/admin" element={<Admin />} />
     </Routes>
