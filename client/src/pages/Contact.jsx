@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { sendMessage } from "../api";
+import MapEmbed from "../components/MapEmbed";
 
 const initialForm = { name: "", email: "", phone: "", message: "" };
 
@@ -145,11 +146,10 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="map-embed" style={{ marginTop: 24 }}>
-              <iframe
+            <div style={{ marginTop: 24 }}>
+              <MapEmbed
                 title="Iroda helyszíne térképen"
                 src="https://www.openstreetmap.org/export/embed.html?bbox=19.026869%2C47.4955247%2C19.034869%2C47.4995247&layer=mapnik&marker=47.4975247%2C19.0308690"
-                loading="lazy"
               />
             </div>
             <div className="map-embed-link">
