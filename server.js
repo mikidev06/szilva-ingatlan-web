@@ -14,6 +14,7 @@ import messagesRouter from "./routes/messages.js";
 import authRouter from "./routes/auth.js";
 import appointmentsRouter from "./routes/appointments.js";
 import googleRouter from "./routes/google.js";
+import sitemapRouter from "./routes/sitemap.js";
 
 dotenv.config();
 
@@ -88,6 +89,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api", (req, res) => {
   res.status(404).json({ message: "Nem talalhato vegpont." });
 });
+
+app.use(sitemapRouter);
 
 const clientDistPath = path.join(__dirname, "client", "dist");
 if (fs.existsSync(clientDistPath)) {
