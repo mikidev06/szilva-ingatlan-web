@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchListing, formatPriceRange } from "../api";
+import { fetchListing, formatPriceRange, formatSizeRange } from "../api";
 import Gallery from "../components/Gallery";
 
 export default function ProjectDetail() {
@@ -47,7 +47,7 @@ export default function ProjectDetail() {
 
             <div className="detail-meta-grid">
               <div className="detail-meta-item">
-                <strong>{project.size} m²</strong>
+                <strong>{formatSizeRange(project.sizeMin, project.sizeMax)}</strong>
                 <span>Alapterület</span>
               </div>
               <div className="detail-meta-item">
@@ -57,6 +57,10 @@ export default function ProjectDetail() {
               <div className="detail-meta-item">
                 <strong>{project.category}</strong>
                 <span>Típus</span>
+              </div>
+              <div className="detail-meta-item">
+                <strong>{project.availableUnits}</strong>
+                <span>Szabad lakások</span>
               </div>
             </div>
 

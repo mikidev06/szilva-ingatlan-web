@@ -64,6 +64,12 @@ export function formatPriceRange(min, max) {
   return `${formatPrice(min)} – ${formatPrice(max)}`;
 }
 
+export function formatSizeRange(min, max) {
+  if (!min && !max) return "Alapterület egyeztetés alatt";
+  if (!max || max === min) return `${min || max} m²`;
+  return `${min} – ${max} m²`;
+}
+
 async function parseErrorMessage(res, fallback) {
   try {
     const data = await res.json();

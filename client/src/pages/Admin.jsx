@@ -18,6 +18,7 @@ import {
   disconnectGoogle,
   formatPrice,
   formatPriceRange,
+  formatSizeRange,
 } from "../api";
 
 const TOKEN_KEY = "admin_token";
@@ -481,6 +482,8 @@ export default function Admin() {
                           <th>Kategória</th>
                           <th>Település</th>
                           <th>Ár</th>
+                          <th>Alapterület</th>
+                          <th>Szabad lakások</th>
                           <th>Kiemelt</th>
                           <th></th>
                         </tr>
@@ -492,6 +495,8 @@ export default function Admin() {
                             <td>{project.category}</td>
                             <td>{project.city}</td>
                             <td>{formatPriceRange(project.priceMin, project.priceMax)}</td>
+                            <td>{formatSizeRange(project.sizeMin, project.sizeMax)}</td>
+                            <td>{project.availableUnits}</td>
                             <td>{project.featured ? "Igen" : "—"}</td>
                             <td className="admin-table-actions">
                               <button

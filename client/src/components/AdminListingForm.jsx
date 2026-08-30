@@ -11,7 +11,10 @@ const emptyForm = {
   city: "",
   address: "",
   size: "",
+  sizeMin: "",
+  sizeMax: "",
   rooms: "",
+  availableUnits: "",
   description: "",
   featured: false,
 };
@@ -30,7 +33,10 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           city: initial.city || "",
           address: initial.address || "",
           size: initial.size ?? "",
+          sizeMin: initial.sizeMin ?? "",
+          sizeMax: initial.sizeMax ?? "",
           rooms: initial.rooms ?? "",
+          availableUnits: initial.availableUnits ?? "",
           description: initial.description || "",
           featured: !!initial.featured,
         }
@@ -118,7 +124,10 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
       priceMin: Number(form.priceMin) || 0,
       priceMax: Number(form.priceMax) || 0,
       size: Number(form.size) || 0,
+      sizeMin: Number(form.sizeMin) || 0,
+      sizeMax: Number(form.sizeMax) || 0,
       rooms: Number(form.rooms) || 0,
+      availableUnits: Number(form.availableUnits) || 0,
       images: [...existingImages, ...newImageUrls],
     });
   }
@@ -221,17 +230,47 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           />
         </div>
 
-        <div className="field">
-          <label htmlFor="af-size">Alapterület (m²)</label>
-          <input
-            id="af-size"
-            name="size"
-            type="number"
-            min="0"
-            value={form.size}
-            onChange={handleChange}
-          />
-        </div>
+        {kind === "projekt" ? (
+          <>
+            <div className="field">
+              <label htmlFor="af-size-min">Alapterülettől (m²)</label>
+              <input
+                id="af-size-min"
+                name="sizeMin"
+                type="number"
+                min="0"
+                value={form.sizeMin}
+                onChange={handleChange}
+                placeholder="Pl. 45"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="af-size-max">Alapterületig (m²)</label>
+              <input
+                id="af-size-max"
+                name="sizeMax"
+                type="number"
+                min="0"
+                value={form.sizeMax}
+                onChange={handleChange}
+                placeholder="Pl. 85"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="field">
+            <label htmlFor="af-size">Alapterület (m²)</label>
+            <input
+              id="af-size"
+              name="size"
+              type="number"
+              min="0"
+              value={form.size}
+              onChange={handleChange}
+            />
+          </div>
+        )}
 
         <div className="field">
           <label htmlFor="af-rooms">Szobák száma</label>
@@ -244,6 +283,21 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
             onChange={handleChange}
           />
         </div>
+
+        {kind === "projekt" && (
+          <div className="field">
+            <label htmlFor="af-available-units">Szabad lakások</label>
+            <input
+              id="af-available-units"
+              name="availableUnits"
+              type="number"
+              min="0"
+              value={form.availableUnits}
+              onChange={handleChange}
+              placeholder="Pl. 12"
+            />
+          </div>
+        )}
 
         <div className="field admin-form-span">
           <label>Fényképek</label>

@@ -17,6 +17,8 @@ function buildListingData(body) {
   const kind = body.kind === "projekt" ? "projekt" : "ingatlan";
   const priceMin = Number(body.priceMin) || 0;
   const priceMax = Number(body.priceMax) || 0;
+  const sizeMin = Number(body.sizeMin) || 0;
+  const sizeMax = Number(body.sizeMax) || 0;
 
   return {
     title: body.title,
@@ -27,8 +29,11 @@ function buildListingData(body) {
     priceMax: kind === "projekt" ? priceMax : 0,
     city: body.city,
     address: body.address || "",
-    size: Number(body.size) || 0,
+    size: kind === "projekt" ? sizeMin : Number(body.size) || 0,
+    sizeMin: kind === "projekt" ? sizeMin : 0,
+    sizeMax: kind === "projekt" ? sizeMax : 0,
     rooms: Number(body.rooms) || 0,
+    availableUnits: kind === "projekt" ? Number(body.availableUnits) || 0 : 0,
     description: body.description || "",
     featured: Boolean(body.featured),
     images: Array.isArray(body.images) ? body.images : [],
