@@ -49,7 +49,7 @@ vercel.json         -> Vercel build/routing konfiguráció
 
 A `/admin` oldalon (pl. `http://localhost:5173/admin`) a `.env` fájlban beállított `ADMIN_PASSWORD` jelszóval lehet bejelentkezni. Bejelentkezés után az ingatlanok listázhatók, létrehozhatók, szerkeszthetők és törölhetők. A bejelentkezés egy JWT tokent ad, amit a böngésző `localStorage`-ban tárol 8 óráig.
 
-Egy ingatlanhoz több fénykép is feltölthető közvetlenül a gépről (max. 12 db, egyenként 5 MB-ig). A feltöltött képek [Vercel Blob](https://vercel.com/docs/vercel-blob)-ban tárolódnak (lásd [config/blob.js](config/blob.js)), ehhez a `.env` fájlban be kell állítani a `BLOB_READ_WRITE_TOKEN` értéket – lásd a "Telepítés Vercelre" szakaszt.
+Egy ingatlanhoz több fénykép is feltölthető közvetlenül a gépről. A képek [Vercel Blob](https://vercel.com/docs/vercel-blob)-ban tárolódnak, **közvetlenül a böngészőből** – nem a szerveren keresztül. Ennek oka, hogy a Vercel szerverless függvényeknek 4,5 MB-os kemény kérés-méret korlátjuk van (minden csomagon, ez nem konfigurálható), amit már 1-2 telefonos fénykép is simán túllépne. A böngésző a [`@vercel/blob/client`](https://vercel.com/docs/vercel-blob/client-upload) `upload()` függvényével tölti fel a fájlokat, a `POST /api/listings/blob-upload` végpont ([routes/listings.js](routes/listings.js)) csak egy rövid életű feltöltési tokent ad ki hozzá (az admin JWT-t ellenőrzi előtte). Ehhez a `.env` fájlban be kell állítani a `BLOB_READ_WRITE_TOKEN` értéket – lásd a "Telepítés Vercelre" szakaszt.
 
 ## Cache
 

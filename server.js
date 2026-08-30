@@ -47,7 +47,7 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'"],
+        connectSrc: ["'self'", "https://*.public.blob.vercel-storage.com", "https://blob.vercel-storage.com"],
         frameSrc: ["https://www.openstreetmap.org"],
       },
     },

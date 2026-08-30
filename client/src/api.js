@@ -68,11 +68,14 @@ export async function verifyToken(token) {
   return res.ok;
 }
 
-export async function createListing(token, formData) {
+export async function createListing(token, payload) {
   const res = await fetch(`${BASE_URL}/listings`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     throw new Error(await parseErrorMessage(res, "Nem sikerült létrehozni az ingatlant."));
@@ -80,11 +83,14 @@ export async function createListing(token, formData) {
   return res.json();
 }
 
-export async function updateListing(token, id, formData) {
+export async function updateListing(token, id, payload) {
   const res = await fetch(`${BASE_URL}/listings/${id}`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     throw new Error(await parseErrorMessage(res, "Nem sikerült módosítani az ingatlant."));

@@ -177,6 +177,7 @@ export default function Admin() {
             {formError && <div className="form-status error">{formError}</div>}
             <AdminListingForm
               initial={editing === "new" ? null : editing}
+              token={token}
               onSubmit={handleFormSubmit}
               onCancel={() => {
                 setEditing(null);

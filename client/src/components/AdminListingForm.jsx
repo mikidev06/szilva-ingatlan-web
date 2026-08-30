@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 
 const emptyForm = {
   title: "",
@@ -13,7 +14,9 @@ const emptyForm = {
   featured: false,
 };
 
-export default function AdminListingForm({ initial, onSubmit, onCancel, submitting }) {
+let uploadIdCounter = 0;
+
+export default function AdminListingForm({ initial, token, onSubmit, onCancel, submitting }) {
   const [form, setForm] = useState(() =>
     initial
       ? {
@@ -32,13 +35,12 @@ export default function AdminListingForm({ initial, onSubmit, onCancel, submitti
   );
 
   const [existingImages, setExistingImages] = useState(initial?.images || []);
-  const [newFiles, setNewFiles] = useState([]);
-  const [newPreviews, setNewPreviews] = useState([]);
+  const [uploads, setUploads] = useState([]); // { id, previewUrl, status, url?, error? }
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     return () => {
-      newPreviews.forEach((url) => URL.revokeObjectURL(url));
+      uploads.forEach((u) => URL.revokeObjectURL(u.previewUrl));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -53,42 +55,59 @@ export default function AdminListingForm({ initial, onSubmit, onCancel, submitti
 
   function handleFilesSelected(e) {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    setNewFiles((prev) => [...prev, ...files]);
-    setNewPreviews((prev) => [...prev, ...files.map((file) => URL.createObjectURL(file))]);
     e.target.value = "";
+
+    for (const file of files) {
+      const id = ++uploadIdCounter;
+      const previewUrl = URL.createObjectURL(file);
+      setUploads((prev) => [...prev, { id, previewUrl, status: "uploading" }]);
+
+      upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/listings/blob-upload",
+        clientPayload: JSON.stringify({ token }),
+      })
+        .then((blob) => {
+          setUploads((prev) =>
+            prev.map((u) => (u.id === id ? { ...u, status: "done", url: blob.url } : u))
+          );
+        })
+        .catch((err) => {
+          setUploads((prev) =>
+            prev.map((u) =>
+              u.id === id ? { ...u, status: "error", error: err.message } : u
+            )
+          );
+        });
+    }
   }
 
   function removeExistingImage(url) {
     setExistingImages((prev) => prev.filter((img) => img !== url));
   }
 
-  function removeNewImage(index) {
-    setNewPreviews((prev) => {
-      URL.revokeObjectURL(prev[index]);
-      return prev.filter((_, i) => i !== index);
+  function removeUpload(id) {
+    setUploads((prev) => {
+      const target = prev.find((u) => u.id === id);
+      if (target) URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((u) => u.id !== id);
     });
-    setNewFiles((prev) => prev.filter((_, i) => i !== index));
   }
+
+  const isUploading = uploads.some((u) => u.status === "uploading");
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("type", form.type);
-    formData.append("category", form.category);
-    formData.append("price", String(Number(form.price) || 0));
-    formData.append("city", form.city);
-    formData.append("address", form.address);
-    formData.append("size", String(Number(form.size) || 0));
-    formData.append("rooms", String(Number(form.rooms) || 0));
-    formData.append("description", form.description);
-    formData.append("featured", String(form.featured));
-    formData.append("existingImages", JSON.stringify(existingImages));
-    newFiles.forEach((file) => formData.append("images", file));
+    const newImageUrls = uploads.filter((u) => u.status === "done").map((u) => u.url);
 
-    onSubmit(formData);
+    onSubmit({
+      ...form,
+      price: Number(form.price) || 0,
+      size: Number(form.size) || 0,
+      rooms: Number(form.rooms) || 0,
+      images: [...existingImages, ...newImageUrls],
+    });
   }
 
   return (
@@ -192,7 +211,7 @@ export default function AdminListingForm({ initial, onSubmit, onCancel, submitti
         <div className="field admin-form-span">
           <label>Fényképek</label>
 
-          {(existingImages.length > 0 || newPreviews.length > 0) && (
+          {(existingImages.length > 0 || uploads.length > 0) && (
             <div className="admin-image-grid">
               {existingImages.map((url) => (
                 <div className="admin-image-thumb" key={url}>
@@ -207,13 +226,21 @@ export default function AdminListingForm({ initial, onSubmit, onCancel, submitti
                   </button>
                 </div>
               ))}
-              {newPreviews.map((url, index) => (
-                <div className="admin-image-thumb" key={url}>
-                  <img src={url} alt="" />
+              {uploads.map((u) => (
+                <div className="admin-image-thumb" key={u.id}>
+                  <img src={u.previewUrl} alt="" />
+                  {u.status === "uploading" && (
+                    <div className="admin-image-status">Feltöltés…</div>
+                  )}
+                  {u.status === "error" && (
+                    <div className="admin-image-status admin-image-status-error">
+                      Hiba: {u.error}
+                    </div>
+                  )}
                   <button
                     type="button"
                     className="admin-image-remove"
-                    onClick={() => removeNewImage(index)}
+                    onClick={() => removeUpload(u.id)}
                     aria-label="Kép eltávolítása"
                   >
                     ✕
@@ -266,8 +293,8 @@ export default function AdminListingForm({ initial, onSubmit, onCancel, submitti
         <button type="button" className="btn btn-outline" onClick={onCancel}>
           Mégse
         </button>
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
-          {submitting ? "Mentés…" : "Mentés"}
+        <button type="submit" className="btn btn-primary" disabled={submitting || isUploading}>
+          {isUploading ? "Képek feltöltése…" : submitting ? "Mentés…" : "Mentés"}
         </button>
       </div>
     </form>
