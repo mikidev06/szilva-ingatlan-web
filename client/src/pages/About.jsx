@@ -4,7 +4,8 @@ const badges = [
   "Ingatlanközvetítői szakvizsga",
   "11+ év tapasztalat",
   "Helyi piacismeret",
-  "Angolul beszélek",
+  "Újépítésű projektek teljeskörű kezelése",
+  "Hitelügyintézés"
 ];
 
 const timeline = [
