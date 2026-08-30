@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <span>© {year} Szilágyi Szilvia Ingatlanközvetítő. Minden jog fenntartva.</span>
+          <span>© {year} Szilva Ingatlan Kft. Minden jog fenntartva.</span>
         </div>
       </div>
     </footer>
