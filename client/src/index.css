@@ -69,6 +69,9 @@
 
 * {
   box-sizing: border-box;
+  /* Sima szinatmenet temavaltaskor (vilagos/sotet mod), hogy az oldal
+     ne "ugorjon", hanem lagyan valtson szint. */
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 html,
@@ -303,6 +306,7 @@ button {
 }
 
 .theme-toggle {
+  position: relative;
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -312,8 +316,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
-  line-height: 1;
+  overflow: hidden;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
@@ -322,6 +325,36 @@ button {
   background: var(--color-primary-light);
   border-color: var(--color-primary);
   transform: translateY(-1px);
+}
+
+.theme-toggle:active {
+  transform: scale(0.88);
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  color: var(--color-primary-dark);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.theme-toggle-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle-moon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+
+.theme-toggle.is-dark .theme-toggle-sun {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.4);
+}
+
+.theme-toggle.is-dark .theme-toggle-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
 }
 
 /* Hero */

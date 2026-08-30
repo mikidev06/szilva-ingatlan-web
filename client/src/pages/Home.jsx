@@ -59,7 +59,7 @@ export default function Home() {
           <div className="hero-copy">
             <span className="eyebrow">Ingatlanközvetítés bizalommal</span>
             <h1>Újépítésű ingatlant keres?</h1>
-            <h2>Segítek Önnek megtalálni az ideális otthonát.</h2>
+            <h2>Segítek megtalálni az ideális otthonát.</h2>
             <p>
               Szilágyi Szilvia vagyok, ingatlanközvetítő.
               Segítek Önnek ingatlanát gyorsan, átláthatóan és
