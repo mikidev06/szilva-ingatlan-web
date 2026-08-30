@@ -190,11 +190,13 @@ button {
 .btn-primary {
   background: var(--color-primary);
   color: #fff;
+  box-shadow: var(--shadow-soft);
 }
 
 .btn-primary:hover {
   background: var(--color-primary-dark);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
 }
 
 .nav-phone-btn {
@@ -658,6 +660,13 @@ button {
   border-radius: var(--radius);
   padding: 28px;
   text-align: left;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }
 
 .service-icon {
