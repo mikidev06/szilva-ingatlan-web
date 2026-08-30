@@ -25,16 +25,23 @@ const services = [
 export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const navigate = useNavigate();
 
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
 
   useEffect(() => {
-    fetchListings()
+    fetchListings("ingatlan")
       .then((data) => setFeatured(data.filter((l) => l.featured).slice(0, 3)))
       .catch(() => setFeatured([]))
       .finally(() => setLoading(false));
+
+    fetchListings("projekt")
+      .then((data) => setFeaturedProjects(data.filter((p) => p.featured).slice(0, 3)))
+      .catch(() => setFeaturedProjects([]))
+      .finally(() => setLoadingProjects(false));
   }, []);
 
   function handleSearch(e) {
@@ -149,6 +156,34 @@ export default function Home() {
             <div style={{ textAlign: "center", marginTop: 40 }}>
               <Link to="/ingatlanok" className="btn btn-outline">
                 Összes ingatlan megtekintése
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {(loadingProjects || featuredProjects.length > 0) && (
+        <section className="section">
+          <div className="container">
+            <div className="section-header">
+              <span className="eyebrow">Kiemelt projektek</span>
+              <h2>Nézze meg legfrissebb projektjeinket</h2>
+              <p>Néhány aktuális, kiemelt fejlesztésünk.</p>
+            </div>
+
+            {loadingProjects && <div className="loading-state">Betöltés…</div>}
+
+            {!loadingProjects && featuredProjects.length > 0 && (
+              <div className="listing-grid">
+                {featuredProjects.map((project) => (
+                  <ListingCard key={project._id} listing={project} basePath="/projektek" />
+                ))}
+              </div>
+            )}
+
+            <div style={{ textAlign: "center", marginTop: 40 }}>
+              <Link to="/projektek" className="btn btn-outline">
+                Összes projekt megtekintése
               </Link>
             </div>
           </div>

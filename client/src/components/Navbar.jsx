@@ -5,6 +5,7 @@ import ThemeToggle from "./ThemeToggle";
 const links = [
   { to: "/", label: "Főoldal" },
   { to: "/ingatlanok", label: "Ingatlanok" },
+  { to: "/projektek", label: "Projektek" },
   { to: "/rolam", label: "Rólam" },
   { to: "/idopontfoglalas", label: "Időpontfoglalás" },
   { to: "/kapcsolat", label: "Kapcsolat" },

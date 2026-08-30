@@ -16,7 +16,7 @@ const emptyForm = {
 
 let uploadIdCounter = 0;
 
-export default function AdminListingForm({ initial, token, onSubmit, onCancel, submitting }) {
+export default function AdminListingForm({ initial, token, onSubmit, onCancel, submitting, kind = "ingatlan" }) {
   const [form, setForm] = useState(() =>
     initial
       ? {
@@ -109,6 +109,7 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
 
     onSubmit({
       ...form,
+      kind,
       price: Number(form.price) || 0,
       size: Number(form.size) || 0,
       rooms: Number(form.rooms) || 0,
@@ -286,7 +287,7 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
             checked={form.featured}
             onChange={handleChange}
           />
-          Kiemelt ingatlan a főoldalon
+          {kind === "projekt" ? "Kiemelt projekt a főoldalon" : "Kiemelt ingatlan a főoldalon"}
         </label>
       </div>
 

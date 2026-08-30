@@ -4,6 +4,8 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
 import ListingDetail from "./pages/ListingDetail";
+import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
@@ -29,6 +31,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/ingatlanok" element={<Listings />} />
         <Route path="/ingatlanok/:id" element={<ListingDetail />} />
+        <Route path="/projektek" element={<Projects />} />
+        <Route path="/projektek/:id" element={<ProjectDetail />} />
         <Route path="/rolam" element={<About />} />
         <Route path="/idopontfoglalas" element={<Booking />} />
         <Route path="/kapcsolat" element={<Contact />} />

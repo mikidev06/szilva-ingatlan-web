@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { formatPrice } from "../api";
 
-export default function ListingCard({ listing }) {
+export default function ListingCard({ listing, basePath = "/ingatlanok" }) {
   const coverImage = listing.images?.[0];
 
   return (
-    <Link to={`/ingatlanok/${listing._id}`} className="listing-card">
+    <Link to={`${basePath}/${listing._id}`} className="listing-card">
       <div className="listing-media">
         {coverImage ? (
           <img src={coverImage} alt={listing.title} loading="lazy" />

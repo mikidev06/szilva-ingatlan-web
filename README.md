@@ -139,11 +139,11 @@ A szerver ezen kívül tartalmaz:
 
 ## API végpontok
 
-- `GET /api/listings` – összes ingatlan
-- `GET /api/listings/:id` – egy ingatlan
-- `POST /api/listings` – új ingatlan létrehozása (admin, `Authorization: Bearer <token>`)
-- `PUT /api/listings/:id` – ingatlan módosítása (admin)
-- `DELETE /api/listings/:id` – ingatlan törlése (admin)
+- `GET /api/listings` – összes ingatlan és projekt; `?kind=ingatlan` vagy `?kind=projekt` a szűkítéshez
+- `GET /api/listings/:id` – egy ingatlan vagy projekt
+- `POST /api/listings` – új ingatlan/projekt létrehozása (admin, `Authorization: Bearer <token>`, a `kind` mezővel dől el melyik)
+- `PUT /api/listings/:id` – ingatlan/projekt módosítása (admin)
+- `DELETE /api/listings/:id` – ingatlan/projekt törlése (admin)
 - `POST /api/messages` – kapcsolatfelvételi üzenet mentése
 - `GET /api/messages` – összes üzenet listázása (admin)
 - `DELETE /api/messages/:id` – üzenet törlése (admin)

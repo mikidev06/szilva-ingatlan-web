@@ -47,6 +47,9 @@ export default function Footer() {
                 <Link to="/ingatlanok">Ingatlanok</Link>
               </li>
               <li>
+                <Link to="/projektek">Projektek</Link>
+              </li>
+              <li>
                 <Link to="/rolam">Rólam</Link>
               </li>
               <li>
@@ -88,6 +91,15 @@ export default function Footer() {
               <li>
                 <a href="mailto:szilagyi.szilva@otpip.hu">
                   szilagyi.szilva@otpip.hu
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://partner.ingatlan.com/szilagyi.szilvia3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ingatlan.com profil
                 </a>
               </li>
             </ul>

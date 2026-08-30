@@ -1,7 +1,8 @@
 const BASE_URL = "/api";
 
-export async function fetchListings() {
-  const res = await fetch(`${BASE_URL}/listings`);
+export async function fetchListings(kind) {
+  const query = kind ? `?kind=${kind}` : "";
+  const res = await fetch(`${BASE_URL}/listings${query}`);
   if (!res.ok) throw new Error("Nem sikerult betolteni az ingatlanokat.");
   return res.json();
 }

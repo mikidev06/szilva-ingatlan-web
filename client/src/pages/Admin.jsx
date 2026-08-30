@@ -29,13 +29,17 @@ export default function Admin() {
   const [loginError, setLoginError] = useState(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const [view, setView] = useState("listings"); // "listings" | "appointments" | "messages"
+  const [view, setView] = useState("listings"); // "listings" | "projects" | "appointments" | "messages"
 
   const [listings, setListings] = useState([]);
   const [loadingListings, setLoadingListings] = useState(false);
   const [listError, setListError] = useState(null);
 
-  const [editing, setEditing] = useState(null); // null | "new" | listing object
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [projectError, setProjectError] = useState(null);
+
+  const [editing, setEditing] = useState(null); // null | "new" | listing/project object
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState(null);
 
@@ -84,6 +88,12 @@ export default function Admin() {
   }, [token]);
 
   useEffect(() => {
+    if (token && view === "projects") {
+      loadProjects();
+    }
+  }, [token, view]);
+
+  useEffect(() => {
     if (token && view === "appointments") {
       loadAppointments();
       loadGoogleStatus();
@@ -99,10 +109,19 @@ export default function Admin() {
   function loadListings() {
     setLoadingListings(true);
     setListError(null);
-    fetchListings()
+    fetchListings("ingatlan")
       .then(setListings)
       .catch(() => setListError("Nem sikerült betölteni az ingatlanokat."))
       .finally(() => setLoadingListings(false));
+  }
+
+  function loadProjects() {
+    setLoadingProjects(true);
+    setProjectError(null);
+    fetchListings("projekt")
+      .then(setProjects)
+      .catch(() => setProjectError("Nem sikerült betölteni a projekteket."))
+      .finally(() => setLoadingProjects(false));
   }
 
   function loadAppointments() {
@@ -172,6 +191,7 @@ export default function Admin() {
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setListings([]);
+    setProjects([]);
     setAppointments([]);
     setMessages([]);
   }
@@ -186,7 +206,11 @@ export default function Admin() {
         await updateListing(token, editing._id, payload);
       }
       setEditing(null);
-      loadListings();
+      if (view === "projects") {
+        loadProjects();
+      } else {
+        loadListings();
+      }
     } catch (err) {
       setFormError(err.message);
     } finally {
@@ -201,6 +225,16 @@ export default function Admin() {
       loadListings();
     } catch (err) {
       setListError(err.message);
+    }
+  }
+
+  async function handleDeleteProject(project) {
+    if (!window.confirm(`Biztosan törlöd: „${project.title}”?`)) return;
+    try {
+      await deleteListing(token, project._id);
+      loadProjects();
+    } catch (err) {
+      setProjectError(err.message);
     }
   }
 
@@ -274,6 +308,7 @@ export default function Admin() {
             <span className="eyebrow">Admin felület</span>
             <h1>
               {view === "listings" && "Ingatlanok kezelése"}
+              {view === "projects" && "Projektek kezelése"}
               {view === "appointments" && "Időpontfoglalások"}
               {view === "messages" && "Üzenetek"}
             </h1>
@@ -297,6 +332,13 @@ export default function Admin() {
               onClick={() => setView("listings")}
             >
               Ingatlanok
+            </button>
+            <button
+              type="button"
+              className={`admin-tab ${view === "projects" ? "active" : ""}`}
+              onClick={() => setView("projects")}
+            >
+              Projektek
             </button>
             <button
               type="button"
@@ -324,6 +366,7 @@ export default function Admin() {
                 <AdminListingForm
                   initial={editing === "new" ? null : editing}
                   token={token}
+                  kind="ingatlan"
                   onSubmit={handleFormSubmit}
                   onCancel={() => {
                     setEditing(null);
@@ -379,6 +422,86 @@ export default function Admin() {
                               <button
                                 className="btn btn-danger btn-small"
                                 onClick={() => handleDelete(listing)}
+                              >
+                                Törlés
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {view === "projects" && (
+          <>
+            {editing ? (
+              <div className="admin-panel">
+                <h2>{editing === "new" ? "Új projekt hozzáadása" : "Projekt szerkesztése"}</h2>
+                {formError && <div className="form-status error">{formError}</div>}
+                <AdminListingForm
+                  initial={editing === "new" ? null : editing}
+                  token={token}
+                  kind="projekt"
+                  onSubmit={handleFormSubmit}
+                  onCancel={() => {
+                    setEditing(null);
+                    setFormError(null);
+                  }}
+                  submitting={saving}
+                />
+              </div>
+            ) : (
+              <div className="admin-panel">
+                <div className="admin-panel-header">
+                  <h2>Projektek ({projects.length})</h2>
+                  <button className="btn btn-primary" onClick={() => setEditing("new")}>
+                    + Új projekt
+                  </button>
+                </div>
+
+                {projectError && <div className="form-status error">{projectError}</div>}
+                {loadingProjects && <div className="loading-state">Betöltés…</div>}
+
+                {!loadingProjects && projects.length === 0 && !projectError && (
+                  <div className="empty-state">Még nincs felvett projekt.</div>
+                )}
+
+                {!loadingProjects && projects.length > 0 && (
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Cím</th>
+                          <th>Kategória</th>
+                          <th>Település</th>
+                          <th>Ár</th>
+                          <th>Kiemelt</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {projects.map((project) => (
+                          <tr key={project._id}>
+                            <td>{project.title}</td>
+                            <td>{project.category}</td>
+                            <td>{project.city}</td>
+                            <td>{formatPrice(project.price)}</td>
+                            <td>{project.featured ? "Igen" : "—"}</td>
+                            <td className="admin-table-actions">
+                              <button
+                                className="btn btn-outline btn-small"
+                                onClick={() => setEditing(project)}
+                              >
+                                Szerkesztés
+                              </button>
+                              <button
+                                className="btn btn-danger btn-small"
+                                onClick={() => handleDeleteProject(project)}
                               >
                                 Törlés
                               </button>

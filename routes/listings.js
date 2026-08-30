@@ -8,14 +8,15 @@ import { deleteImages } from "../config/blob.js";
 
 const router = Router();
 
-const LIST_CACHE_KEY = "listings:all";
 const LIST_CACHE_TTL = 60;
 const ITEM_CACHE_TTL = 300;
+const listCacheKey = (kind) => `listings:all:${kind || "any"}`;
 const itemCacheKey = (id) => `listings:${id}`;
 
 function buildListingData(body) {
   return {
     title: body.title,
+    kind: body.kind === "projekt" ? "projekt" : "ingatlan",
     category: body.category,
     price: Number(body.price) || 0,
     city: body.city,
@@ -72,16 +73,19 @@ router.post("/blob-upload", async (req, res) => {
   }
 });
 
-// GET /api/listings - osszes ingatlan lekerese (cache-elve)
+// GET /api/listings?kind=ingatlan|projekt - ingatlanok/projektek lekerese
+// (cache-elve). Kind nelkul mindkettot visszaadja.
 router.get("/", async (req, res) => {
   try {
-    const cached = cacheGet(LIST_CACHE_KEY);
+    const kind = req.query.kind === "projekt" || req.query.kind === "ingatlan" ? req.query.kind : null;
+    const key = listCacheKey(kind);
+    const cached = cacheGet(key);
     if (cached) {
       return res.json(cached);
     }
 
-    const listings = await Listing.find().sort({ createdAt: -1 });
-    cacheSet(LIST_CACHE_KEY, listings, LIST_CACHE_TTL);
+    const listings = await Listing.find(kind ? { kind } : {}).sort({ createdAt: -1 });
+    cacheSet(key, listings, LIST_CACHE_TTL);
     res.json(listings);
   } catch (err) {
     console.error(err);
@@ -116,7 +120,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", requireAuth, async (req, res) => {
   try {
     const listing = await Listing.create(buildListingData(req.body));
-    cacheDel(LIST_CACHE_KEY);
+    cacheDel(listCacheKey(null), listCacheKey("ingatlan"), listCacheKey("projekt"));
     res.status(201).json(listing);
   } catch (err) {
     res.status(400).json({ message: "Hibas adatok.", error: err.message });
@@ -142,7 +146,7 @@ router.put("/:id", requireAuth, async (req, res) => {
     });
 
     await deleteImages(removedImages);
-    cacheDel(LIST_CACHE_KEY, itemCacheKey(req.params.id));
+    cacheDel(listCacheKey(null), listCacheKey("ingatlan"), listCacheKey("projekt"), itemCacheKey(req.params.id));
     res.json(listing);
   } catch (err) {
     res.status(400).json({ message: "Hibas adatok.", error: err.message });
@@ -157,7 +161,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
       return res.status(404).json({ message: "Nem talalhato ingatlan." });
     }
     await deleteImages(listing.images);
-    cacheDel(LIST_CACHE_KEY, itemCacheKey(req.params.id));
+    cacheDel(listCacheKey(null), listCacheKey("ingatlan"), listCacheKey("projekt"), itemCacheKey(req.params.id));
     res.json({ message: "Ingatlan torolve." });
   } catch (err) {
     console.error(err);
