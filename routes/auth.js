@@ -1,20 +1,24 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import requireAuth from "../middleware/auth.js";
 
 const router = Router();
 
-// POST /api/auth/login - admin bejelentkezes jelszoval
-router.post("/login", (req, res) => {
+// POST /api/auth/login - admin bejelentkezes jelszoval. A jelszo bcrypt
+// hash-kent van tarolva az ADMIN_PASSWORD_HASH kornyezeti valtozoban (nem
+// sima szovegkent), lasd: scripts/hashPassword.mjs.
+router.post("/login", async (req, res) => {
   const { password } = req.body;
 
-  if (!process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
+  if (!process.env.ADMIN_PASSWORD_HASH || !process.env.JWT_SECRET) {
     return res.status(500).json({
-      message: "A szerver nincs beállítva admin bejelentkezésre (ADMIN_PASSWORD / JWT_SECRET hiányzik).",
+      message: "A szerver nincs beállítva admin bejelentkezésre (ADMIN_PASSWORD_HASH / JWT_SECRET hiányzik).",
     });
   }
 
-  if (!password || password !== process.env.ADMIN_PASSWORD) {
+  const valid = password && (await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH));
+  if (!valid) {
     return res.status(401).json({ message: "Hibás jelszó." });
   }
 

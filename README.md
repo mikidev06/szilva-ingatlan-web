@@ -14,13 +14,13 @@ vercel.json         -> Vercel build/routing konfiguráció
 ## Beállítás
 
 1. Hozz létre egy MongoDB Atlas clustert, és másold ki a kapcsolati stringet.
-2. Másold le a `.env.example` fájlt `.env` néven, és add meg benne a saját `MONGODB_URI`, `ADMIN_PASSWORD` és `JWT_SECRET` értékeket:
+2. Másold le a `.env.example` fájlt `.env` néven, és add meg benne a saját `MONGODB_URI`, `ADMIN_PASSWORD_HASH` és `JWT_SECRET` értékeket:
 
    ```
    cp .env.example .env
    ```
 
-   `ADMIN_PASSWORD` a `/admin` oldal bejelentkezési jelszava, `JWT_SECRET` egy tetszőleges, hosszú, véletlenszerű karakterlánc legyen.
+   `ADMIN_PASSWORD_HASH` a `/admin` oldal bejelentkezési jelszavának bcrypt hash-e (nem a sima jelszó!) - generáld a `npm run hash-password -- <a-jelszavad>` paranccsal, és az eredményt másold az `ADMIN_PASSWORD_HASH` értékeként. `JWT_SECRET` egy tetszőleges, hosszú, véletlenszerű karakterlánc legyen.
 
 3. Telepítsd a backend függőségeket a gyökérben, majd a frontend függőségeket a `client` mappában:
 
@@ -47,7 +47,7 @@ vercel.json         -> Vercel build/routing konfiguráció
 
 ## Admin felület
 
-A `/admin` oldalon (pl. `http://localhost:5173/admin`) a `.env` fájlban beállított `ADMIN_PASSWORD` jelszóval lehet bejelentkezni. Bejelentkezés után az ingatlanok listázhatók, létrehozhatók, szerkeszthetők és törölhetők. A bejelentkezés egy JWT tokent ad, amit a böngésző `localStorage`-ban tárol 8 óráig.
+A `/admin` oldalon (pl. `http://localhost:5173/admin`) a `.env` fájlban beállított `ADMIN_PASSWORD_HASH`-nek megfelelő jelszóval lehet bejelentkezni. Bejelentkezés után az ingatlanok listázhatók, létrehozhatók, szerkeszthetők és törölhetők. A bejelentkezés egy JWT tokent ad, amit a böngésző `localStorage`-ban tárol 8 óráig.
 
 Egy ingatlanhoz több fénykép is feltölthető közvetlenül a gépről. A képek [Vercel Blob](https://vercel.com/docs/vercel-blob)-ban tárolódnak, **közvetlenül a böngészőből** – nem a szerveren keresztül. Ennek oka, hogy a Vercel szerverless függvényeknek 4,5 MB-os kemény kérés-méret korlátjuk van (minden csomagon, ez nem konfigurálható), amit már 1-2 telefonos fénykép is simán túllépne. A böngésző a [`@vercel/blob/client`](https://vercel.com/docs/vercel-blob/client-upload) `upload()` függvényével tölti fel a fájlokat, a `POST /api/listings/blob-upload` végpont ([routes/listings.js](routes/listings.js)) csak egy rövid életű feltöltési tokent ad ki hozzá (az admin JWT-t ellenőrzi előtte). Ehhez a `.env` fájlban be kell állítani a `BLOB_READ_WRITE_TOKEN` értéket – lásd a "Telepítés Vercelre" szakaszt.
 
@@ -108,7 +108,7 @@ A projekt Vercelre van konfigurálva ([vercel.json](vercel.json)): a React klien
    vercel blob create-store szilvia-ingatlan-images --access public
    ```
 
-3. Állítsd be a projekt környezeti változóit a Vercel dashboardon (Settings → Environment Variables), vagy a CLI-vel: `MONGODB_URI`, `ADMIN_PASSWORD`, `JWT_SECRET`, `NTFY_TOPIC`, opcionálisan `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` (lásd a "Google Naptár szinkronizáció" szakaszt) (a `BLOB_READ_WRITE_TOKEN`-t az előző lépés automatikusan beállítja). `NODE_ENV` és `VERCEL` Vercelen automatikusan be van állítva, ezeket nem kell megadni.
+3. Állítsd be a projekt környezeti változóit a Vercel dashboardon (Settings → Environment Variables), vagy a CLI-vel: `MONGODB_URI`, `ADMIN_PASSWORD_HASH` (a `npm run hash-password -- <jelszo>` paranccsal generált hash, nem a sima jelszó), `JWT_SECRET`, `NTFY_TOPIC`, opcionálisan `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` (lásd a "Google Naptár szinkronizáció" szakaszt) (a `BLOB_READ_WRITE_TOKEN`-t az előző lépés automatikusan beállítja). `NODE_ENV` és `VERCEL` Vercelen automatikusan be van állítva, ezeket nem kell megadni.
 4. Húzd le a változókat helyi fejlesztéshez, ha szükséges: `vercel env pull .env`.
 5. Minden Git push a fő branch-re automatikusan újra deployol.
 
@@ -123,7 +123,7 @@ NODE_ENV=production npm start
 
 A `build` telepíti és lebuildeli a React alkalmazást a `client/dist` mappába. Ha ez a mappa létezik, a szerver `NODE_ENV=production` esetén automatikusan ki is szolgálja azt (statikus fájlok + kliensoldali route-ok fallback-je), tehát a backend és a frontend egyetlen szolgáltatásként, egy porton fut – külön frontend hosting nem szükséges.
 
-Production módban a szerver induláskor ellenőrzi, hogy a kötelező környezeti változók (`MONGODB_URI`, `ADMIN_PASSWORD`, `JWT_SECRET`) be vannak-e állítva, és leáll, ha valamelyik hiányzik.
+Production módban a szerver induláskor ellenőrzi, hogy a kötelező környezeti változók (`MONGODB_URI`, `ADMIN_PASSWORD_HASH`, `JWT_SECRET`) be vannak-e állítva, és leáll, ha valamelyik hiányzik.
 
 További production beállítások a `.env`-ben:
 

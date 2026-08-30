@@ -21,7 +21,7 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === "production";
 
-const requiredEnvVars = ["MONGODB_URI", "ADMIN_PASSWORD", "JWT_SECRET"];
+const requiredEnvVars = ["MONGODB_URI", "ADMIN_PASSWORD_HASH", "JWT_SECRET"];
 const missingEnvVars = requiredEnvVars.filter((name) => !process.env[name]);
 
 if (isProduction && missingEnvVars.length > 0) {
