@@ -665,7 +665,7 @@ button {
 /* CTA */
 
 .cta-band {
-  background: var(--color-contrast-band);
+  background: var(--color-primary);
   color: #fff;
   border-radius: var(--radius);
   padding: 56px 40px;
@@ -677,9 +677,18 @@ button {
 }
 
 .cta-band p {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.85);
   max-width: 520px;
   margin: 0 auto 28px;
+}
+
+.cta-band .btn-primary {
+  background: #fff;
+  color: var(--color-primary-dark);
+}
+
+.cta-band .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.88);
 }
 
 /* Forms */
