@@ -10,8 +10,7 @@ export default function Footer() {
           <div className="footer-col">
             <div className="footer-brand">Szilágyi Szilvia</div>
             <p>
-              Több éves tapasztalattal segítek ügyfeleimnek sikeresen
-              értékesíteni ingatlanukat.
+              Otthonteremtési szakértő
             </p>
             <div className="footer-social">
               <a

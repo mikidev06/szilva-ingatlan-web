@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchListing, formatPrice } from "../api";
+import { fetchListing, formatPriceRange } from "../api";
 import Gallery from "../components/Gallery";
 
 export default function ProjectDetail() {
@@ -71,7 +71,7 @@ export default function ProjectDetail() {
               {project.address ? `, ${project.address}` : ""}
             </div>
             <div className="listing-price" style={{ fontSize: "1.6rem", marginBottom: 20 }}>
-              {formatPrice(project.price)}
+              {formatPriceRange(project.priceMin, project.priceMax)}
             </div>
 
             <Link to="/kapcsolat" className="btn btn-primary btn-block">

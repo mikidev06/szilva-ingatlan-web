@@ -58,7 +58,8 @@ export default function Home() {
         <div className="container hero-inner">
           <div className="hero-copy">
             <span className="eyebrow">Ingatlanközvetítés bizalommal</span>
-            <h1>Adja el ingatlanát magabiztosan</h1>
+            <h1>Újépítésű ingatlant keres?</h1>
+            <h2>Segítek Önnek megtalálni az ideális otthonát.</h2>
             <p>
               Szilágyi Szilvia vagyok, ingatlanközvetítő.
               Segítek Önnek ingatlanát gyorsan, átláthatóan és
@@ -68,6 +69,10 @@ export default function Home() {
               <Link to="/ingatlanok" className="btn btn-primary">
                 Ingatlanok böngészése
               </Link>
+              <Link to="/projektek" className="btn btn-primary">
+                Projektek böngészése
+              </Link>
+              <br></br>
               <Link to="/kapcsolat" className="btn btn-outline">
                 Kapcsolatfelvétel
               </Link>
@@ -236,10 +241,6 @@ export default function Home() {
         <div className="container">
           <div className="cta-band">
             <h2>Készen áll a következő lépésre?</h2>
-            <p>
-              Vegye fel velem a kapcsolatot egy ingyenes, nem kötelező
-              érvényű konzultációért.
-            </p>
             <Link to="/idopontfoglalas" className="btn btn-primary">
               Időpontot kérek
             </Link>

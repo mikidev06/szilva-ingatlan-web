@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatPrice } from "../api";
+import { formatPrice, formatPriceRange } from "../api";
 
 export default function ListingCard({ listing, basePath = "/ingatlanok" }) {
   const coverImage = listing.images?.[0];
@@ -15,7 +15,9 @@ export default function ListingCard({ listing, basePath = "/ingatlanok" }) {
       </div>
       <div className="listing-body">
         <div className="listing-price">
-          {formatPrice(listing.price)}
+          {listing.kind === "projekt"
+            ? formatPriceRange(listing.priceMin, listing.priceMax)
+            : formatPrice(listing.price)}
         </div>
         <h3 className="listing-title">{listing.title}</h3>
         <div className="listing-location">

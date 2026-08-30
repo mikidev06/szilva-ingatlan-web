@@ -58,6 +58,12 @@ function formatRounded(amount) {
   return new Intl.NumberFormat("hu-HU", { maximumFractionDigits: 1 }).format(amount);
 }
 
+export function formatPriceRange(min, max) {
+  if (!min && !max) return "Ár egyeztetés alatt";
+  if (!max || max === min) return formatPrice(min || max);
+  return `${formatPrice(min)} – ${formatPrice(max)}`;
+}
+
 async function parseErrorMessage(res, fallback) {
   try {
     const data = await res.json();

@@ -6,6 +6,8 @@ const emptyForm = {
   title: "",
   category: "Lakás",
   price: "",
+  priceMin: "",
+  priceMax: "",
   city: "",
   address: "",
   size: "",
@@ -23,6 +25,8 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           title: initial.title || "",
           category: initial.category || "Lakás",
           price: initial.price ?? "",
+          priceMin: initial.priceMin ?? "",
+          priceMax: initial.priceMax ?? "",
           city: initial.city || "",
           address: initial.address || "",
           size: initial.size ?? "",
@@ -111,6 +115,8 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
       ...form,
       kind,
       price: Number(form.price) || 0,
+      priceMin: Number(form.priceMin) || 0,
+      priceMax: Number(form.priceMax) || 0,
       size: Number(form.size) || 0,
       rooms: Number(form.rooms) || 0,
       images: [...existingImages, ...newImageUrls],
@@ -144,19 +150,51 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           </select>
         </div>
 
-        <div className="field">
-          <label htmlFor="af-price">Ár (Ft) *</label>
-          <input
-            id="af-price"
-            name="price"
-            type="number"
-            min="0"
-            required
-            value={form.price}
-            onChange={handleChange}
-            placeholder="Pl. 55000000"
-          />
-        </div>
+        {kind === "projekt" ? (
+          <>
+            <div className="field">
+              <label htmlFor="af-price-min">Ártól (Ft) *</label>
+              <input
+                id="af-price-min"
+                name="priceMin"
+                type="number"
+                min="0"
+                required
+                value={form.priceMin}
+                onChange={handleChange}
+                placeholder="Pl. 45000000"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="af-price-max">Árig (Ft) *</label>
+              <input
+                id="af-price-max"
+                name="priceMax"
+                type="number"
+                min="0"
+                required
+                value={form.priceMax}
+                onChange={handleChange}
+                placeholder="Pl. 62000000"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="field">
+            <label htmlFor="af-price">Ár (Ft) *</label>
+            <input
+              id="af-price"
+              name="price"
+              type="number"
+              min="0"
+              required
+              value={form.price}
+              onChange={handleChange}
+              placeholder="Pl. 55000000"
+            />
+          </div>
+        )}
 
         <div className="field">
           <label htmlFor="af-city">Település *</label>

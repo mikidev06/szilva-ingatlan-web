@@ -14,11 +14,17 @@ const listCacheKey = (kind) => `listings:all:${kind || "any"}`;
 const itemCacheKey = (id) => `listings:${id}`;
 
 function buildListingData(body) {
+  const kind = body.kind === "projekt" ? "projekt" : "ingatlan";
+  const priceMin = Number(body.priceMin) || 0;
+  const priceMax = Number(body.priceMax) || 0;
+
   return {
     title: body.title,
-    kind: body.kind === "projekt" ? "projekt" : "ingatlan",
+    kind,
     category: body.category,
-    price: Number(body.price) || 0,
+    price: kind === "projekt" ? priceMin : Number(body.price) || 0,
+    priceMin: kind === "projekt" ? priceMin : 0,
+    priceMax: kind === "projekt" ? priceMax : 0,
     city: body.city,
     address: body.address || "",
     size: Number(body.size) || 0,

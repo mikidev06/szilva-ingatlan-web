@@ -17,6 +17,7 @@ import {
   fetchGoogleAuthUrl,
   disconnectGoogle,
   formatPrice,
+  formatPriceRange,
 } from "../api";
 
 const TOKEN_KEY = "admin_token";
@@ -490,7 +491,7 @@ export default function Admin() {
                             <td>{project.title}</td>
                             <td>{project.category}</td>
                             <td>{project.city}</td>
-                            <td>{formatPrice(project.price)}</td>
+                            <td>{formatPriceRange(project.priceMin, project.priceMax)}</td>
                             <td>{project.featured ? "Igen" : "—"}</td>
                             <td className="admin-table-actions">
                               <button

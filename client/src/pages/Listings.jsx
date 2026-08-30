@@ -13,7 +13,7 @@ export default function Listings() {
   const category = searchParams.get("category") || "";
 
   useEffect(() => {
-    fetchListings()
+    fetchListings("ingatlan")
       .then(setListings)
       .catch(() => setError("Nem sikerült betölteni az ingatlanokat."))
       .finally(() => setLoading(false));
