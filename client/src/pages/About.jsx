@@ -30,7 +30,7 @@ export default function About() {
         <div className="container">
           <span className="eyebrow">Bemutatkozás</span>
           <h1>Szilágyi Szilvia vagyok</h1>
-          <p>Ingatlanközvetítő, aki szívügyének tekinti, hogy ügyfelei a lehető legjobb döntést hozzák.</p>
+          <p>Otthonteremtési szakértő, aki szívügyének tekinti, hogy ügyfelei a lehető legjobb döntést hozzák.</p>
         </div>
       </div>
 
