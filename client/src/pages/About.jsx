@@ -1,4 +1,4 @@
-import szilviaPhoto from "../assets/r_88813_0.jpg";
+import szilviaPhoto from "../assets/szilva-2.jpg";
 
 const badges = [
   "Ingatlanközvetítői szakvizsga",

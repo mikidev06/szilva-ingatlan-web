@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import { fetchListings } from "../api";
-import szilviaPhoto from "../assets/r_88813_0.jpg";
+import szilviaPhoto from "../assets/szilva-1.jpg";
 
 const services = [
   {
