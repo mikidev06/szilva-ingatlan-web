@@ -268,6 +268,10 @@ button {
   color: var(--color-primary-dark);
 }
 
+.nav-links-phone {
+  display: none;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
@@ -1177,6 +1181,10 @@ button {
 }
 
 @media (max-width: 720px) {
+  .hero-visual {
+    aspect-ratio: 4 / 5;
+  }
+
   .gallery-side-thumb {
     display: none;
   }
@@ -1222,6 +1230,11 @@ button {
 
   .nav-actions .btn-primary {
     display: none;
+  }
+
+  .nav-links-phone {
+    display: inline-flex;
+    margin-top: 4px;
   }
 
   .search-bar {
