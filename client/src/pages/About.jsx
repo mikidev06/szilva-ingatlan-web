@@ -1,7 +1,7 @@
 import szilviaPhoto from "../assets/szilva-2.jpg";
 
 const badges = [
-  "Ingatlanközvetítői szakvizsga",
+  "Okleveles ingatlanközvetítő",
   "11+ év tapasztalat",
   "Helyi piacismeret",
   "Újépítésű projektek teljeskörű kezelése",

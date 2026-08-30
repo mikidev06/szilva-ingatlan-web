@@ -100,7 +100,7 @@ export default function Home() {
             />
             <div className="hero-badge">
               <strong>Szilágyi Szilvia</strong>
-              Ingatlanközvetítő
+              Otthonteremtési szakértő
             </div>
           </div>
         </div>
@@ -241,6 +241,7 @@ export default function Home() {
         <div className="container">
           <div className="cta-band">
             <h2>Készen áll a következő lépésre?</h2>
+            <br></br>
             <Link to="/idopontfoglalas" className="btn btn-primary">
               Időpontot kérek
             </Link>
