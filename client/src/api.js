@@ -132,6 +132,12 @@ export async function fetchAvailability(date) {
   return res.json();
 }
 
+export async function fetchFullDays(year, month) {
+  const res = await fetch(`${BASE_URL}/appointments/full-days?year=${year}&month=${month}`);
+  if (!res.ok) throw new Error("Nem sikerült betölteni a foglaltságot.");
+  return res.json();
+}
+
 export async function createAppointment(payload) {
   const res = await fetch(`${BASE_URL}/appointments`, {
     method: "POST",
@@ -159,6 +165,35 @@ export async function deleteAppointment(token, id) {
   });
   if (!res.ok) {
     throw new Error(await parseErrorMessage(res, "Nem sikerült törölni a foglalást."));
+  }
+  return res.json();
+}
+
+export async function fetchGoogleStatus(token) {
+  const res = await fetch(`${BASE_URL}/google/status`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Nem sikerült lekérdezni a Google Naptár állapotát.");
+  return res.json();
+}
+
+export async function fetchGoogleAuthUrl(token) {
+  const res = await fetch(`${BASE_URL}/google/auth-url`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "Nem sikerült elindítani a Google összekapcsolást."));
+  }
+  return res.json();
+}
+
+export async function disconnectGoogle(token) {
+  const res = await fetch(`${BASE_URL}/google/disconnect`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "Nem sikerült leválasztani a Google Naptárt."));
   }
   return res.json();
 }

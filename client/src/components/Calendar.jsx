@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchFullDays } from "../api";
 
 const WEEKDAY_LABELS = ["H", "K", "Sze", "Cs", "P", "Szo", "V"];
 
@@ -22,6 +23,22 @@ export default function Calendar({ selectedDate, onSelectDate }) {
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
+
+  const [fullDays, setFullDays] = useState(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchFullDays(year, month + 1)
+      .then((data) => {
+        if (!cancelled) setFullDays(new Set(data.fullDays || []));
+      })
+      .catch(() => {
+        if (!cancelled) setFullDays(new Set());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [year, month]);
 
   const firstOfMonth = new Date(year, month, 1);
   const firstWeekday = (firstOfMonth.getDay() + 6) % 7; // 0 = hétfő
@@ -68,15 +85,17 @@ export default function Calendar({ selectedDate, onSelectDate }) {
           if (!date) return <div key={`empty-${i}`} className="calendar-cell-empty" />;
 
           const key = toDateKey(date);
-          const disabled = date < today || isWeekend(date);
+          const isFull = fullDays.has(key);
+          const disabled = date < today || isWeekend(date) || isFull;
           const isSelected = selectedDate === key;
 
           return (
             <button
               type="button"
               key={key}
-              className={`calendar-cell ${isSelected ? "selected" : ""}`}
+              className={`calendar-cell ${isSelected ? "selected" : ""} ${isFull ? "full" : ""}`}
               disabled={disabled}
+              title={isFull ? "Erre a napra nincs szabad időpont" : undefined}
               onClick={() => onSelectDate(key)}
             >
               {date.getDate()}

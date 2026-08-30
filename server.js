@@ -13,6 +13,7 @@ import listingsRouter from "./routes/listings.js";
 import messagesRouter from "./routes/messages.js";
 import authRouter from "./routes/auth.js";
 import appointmentsRouter from "./routes/appointments.js";
+import googleRouter from "./routes/google.js";
 
 dotenv.config();
 
@@ -78,6 +79,7 @@ app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/listings", listingsRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/api/appointments", appointmentsRouter);
+app.use("/api/google", googleRouter);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

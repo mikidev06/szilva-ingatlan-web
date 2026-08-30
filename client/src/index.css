@@ -1452,6 +1452,42 @@ button {
   overflow-x: auto;
 }
 
+.google-sync-card {
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.google-sync-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.google-sync-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.google-sync-row strong {
+  display: block;
+}
+
+.google-sync-status {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.google-sync-status.connected {
+  color: var(--color-success, #4a9d5f);
+  font-weight: 600;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -1710,6 +1746,11 @@ button {
   color: var(--color-text-muted);
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.calendar-cell.full:disabled {
+  opacity: 0.5;
+  text-decoration: line-through;
 }
 
 .calendar-cell.selected {

@@ -65,6 +65,32 @@ Beállítás:
 
 Ha a `NTFY_TOPIC` nincs beállítva, az értesítés egyszerűen kimarad – az üzenet/foglalás mentése ettől függetlenül működik.
 
+## Google Naptár szinkronizáció
+
+Az időpontfoglalás rendszer opcionálisan kétirányban szinkronizálhat Szilvia Google Naptárával ([config/googleCalendar.js](config/googleCalendar.js)):
+
+- **Kifelé:** minden weboldalon leadott foglalás automatikusan bekerül az ő Google Naptárába eseményként.
+- **Befelé:** a foglalási oldal (naptár nézet + időpont-választó) figyelembe veszi az ő Google Naptárában szereplő, bármilyen okból foglalt időpontokat is – nemcsak a weboldalon keresztül érkezett foglalásokat –, és azokat is betelt/foglalt időpontként jeleníti meg.
+
+Ha nincs beállítva vagy nincs összekapcsolva, a rendszer változatlanul, kizárólag a saját adatbázisával működik tovább – ez sosem akadályozza a foglalást.
+
+### Beállítás (Google Cloud Console)
+
+1. Hozz létre egy projektet a [Google Cloud Console](https://console.cloud.google.com/)-on (vagy használj egy meglévőt).
+2. **APIs & Services → Library**: keresd meg és engedélyezd a **Google Calendar API**-t.
+3. **APIs & Services → OAuth consent screen**: válaszd az **External** típust. Mivel csak Szilvia saját fiókja fog csatlakozni, nem szükséges Google-ellenőrzés – add hozzá az ő Google fiókjának e-mail címét a **Test users** listához, és így "Testing" állapotban is működni fog.
+4. **APIs & Services → Credentials → Create Credentials → OAuth client ID**:
+   - Application type: **Web application**
+   - Authorized redirect URIs: add hozzá pontosan ezt: `https://szilva-ingatlan-web.vercel.app/api/google/callback`
+   - A létrehozás után másold ki a **Client ID**-t és a **Client secret**-et.
+5. Állítsd be a Vercel projekten (Settings → Environment Variables, vagy `vercel env add`) a következő változókat:
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `GOOGLE_REDIRECT_URI` = `https://szilva-ingatlan-web.vercel.app/api/google/callback`
+6. Deploy után jelentkezz be a `/admin` felületre, nyisd meg az **Időpontfoglalások** fület, és kattints az **Összekapcsolás** gombra a "Google Naptár" dobozban – ez átirányít a Google beleegyezési képernyőjére. Elfogadás után a rendszer automatikusan visszairányít, és onnantól aktív a szinkronizáció.
+
+A kapcsolat bármikor bontható a **Leválasztás** gombbal ugyanitt.
+
 ## Cache
 
 A `GET /api/listings` és `GET /api/listings/:id` végpontok egy egyszerű, folyamaton belüli (in-memory) TTL cache-ben tárolják a válaszokat (60, illetve 300 másodpercig), létrehozáskor/módosításkor/törléskor pedig a szerver automatikusan érvényteleníti az érintett bejegyzéseket. Lásd [config/cache.js](config/cache.js).
@@ -82,7 +108,7 @@ A projekt Vercelre van konfigurálva ([vercel.json](vercel.json)): a React klien
    vercel blob create-store szilvia-ingatlan-images --access public
    ```
 
-3. Állítsd be a projekt környezeti változóit a Vercel dashboardon (Settings → Environment Variables), vagy a CLI-vel: `MONGODB_URI`, `ADMIN_PASSWORD`, `JWT_SECRET`, `NTFY_TOPIC` (a `BLOB_READ_WRITE_TOKEN`-t az előző lépés automatikusan beállítja). `NODE_ENV` és `VERCEL` Vercelen automatikusan be van állítva, ezeket nem kell megadni.
+3. Állítsd be a projekt környezeti változóit a Vercel dashboardon (Settings → Environment Variables), vagy a CLI-vel: `MONGODB_URI`, `ADMIN_PASSWORD`, `JWT_SECRET`, `NTFY_TOPIC`, opcionálisan `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` (lásd a "Google Naptár szinkronizáció" szakaszt) (a `BLOB_READ_WRITE_TOKEN`-t az előző lépés automatikusan beállítja). `NODE_ENV` és `VERCEL` Vercelen automatikusan be van állítva, ezeket nem kell megadni.
 4. Húzd le a változókat helyi fejlesztéshez, ha szükséges: `vercel env pull .env`.
 5. Minden Git push a fő branch-re automatikusan újra deployol.
 
@@ -121,10 +147,15 @@ A szerver ezen kívül tartalmaz:
 - `POST /api/messages` – kapcsolatfelvételi üzenet mentése
 - `GET /api/messages` – összes üzenet listázása (admin)
 - `DELETE /api/messages/:id` – üzenet törlése (admin)
-- `GET /api/appointments/availability?date=YYYY-MM-DD` – foglalt/szabad időpontok egy napra
+- `GET /api/appointments/availability?date=YYYY-MM-DD` – foglalt/szabad időpontok egy napra (a saját adatbázis + összekapcsolt Google Naptár alapján)
+- `GET /api/appointments/full-days?year=YYYY&month=MM` – adott hónapban teljesen betelt napok
 - `POST /api/appointments` – időpontfoglalás létrehozása
 - `GET /api/appointments` – összes foglalás listázása (admin)
 - `DELETE /api/appointments/:id` – foglalás lemondása (admin)
+- `GET /api/google/auth-url` – Google OAuth beleegyezési link (admin)
+- `GET /api/google/callback` – Google OAuth callback (a Google hívja meg, nem közvetlen használatra)
+- `GET /api/google/status` – Google Naptár kapcsolat állapota (admin)
+- `DELETE /api/google/disconnect` – Google Naptár kapcsolat törlése (admin)
 - `POST /api/auth/login` – admin bejelentkezés jelszóval, JWT tokent ad vissza
 - `GET /api/auth/verify` – token érvényességének ellenőrzése
 - `GET /api/health` – állapotellenőrzés

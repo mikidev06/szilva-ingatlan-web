@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AdminListingForm from "../components/AdminListingForm";
 import ThemeToggle from "../components/ThemeToggle";
 import {
@@ -13,6 +13,9 @@ import {
   deleteAppointment,
   fetchMessages,
   deleteMessage,
+  fetchGoogleStatus,
+  fetchGoogleAuthUrl,
+  disconnectGoogle,
   formatPrice,
 } from "../api";
 
@@ -46,6 +49,17 @@ export default function Admin() {
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [messagesError, setMessagesError] = useState(null);
 
+  const [googleStatus, setGoogleStatus] = useState(null); // null | { configured, connected }
+  const [googleError, setGoogleError] = useState(null);
+  const [connectingGoogle, setConnectingGoogle] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const googleRedirectResult = searchParams.get("google"); // "connected" | "error" | null
+
+  useEffect(() => {
+    if (!googleRedirectResult) return;
+    setSearchParams({}, { replace: true });
+  }, [googleRedirectResult, setSearchParams]);
+
   useEffect(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
     if (!stored) {
@@ -72,8 +86,9 @@ export default function Admin() {
   useEffect(() => {
     if (token && view === "appointments") {
       loadAppointments();
+      loadGoogleStatus();
     }
-  }, [token, view]);
+  }, [token, view, googleRedirectResult]);
 
   useEffect(() => {
     if (token && view === "messages") {
@@ -97,6 +112,35 @@ export default function Admin() {
       .then(setAppointments)
       .catch(() => setAppointmentsError("Nem sikerült betölteni a foglalásokat."))
       .finally(() => setLoadingAppointments(false));
+  }
+
+  function loadGoogleStatus() {
+    setGoogleError(null);
+    fetchGoogleStatus(token)
+      .then(setGoogleStatus)
+      .catch(() => setGoogleStatus(null));
+  }
+
+  async function handleConnectGoogle() {
+    setConnectingGoogle(true);
+    setGoogleError(null);
+    try {
+      const { url } = await fetchGoogleAuthUrl(token);
+      window.location.href = url;
+    } catch (err) {
+      setGoogleError(err.message);
+      setConnectingGoogle(false);
+    }
+  }
+
+  async function handleDisconnectGoogle() {
+    if (!window.confirm("Biztosan leválasztod a Google Naptárt?")) return;
+    try {
+      await disconnectGoogle(token);
+      loadGoogleStatus();
+    } catch (err) {
+      setGoogleError(err.message);
+    }
   }
 
   function loadMessages() {
@@ -354,6 +398,49 @@ export default function Admin() {
           <div className="admin-panel">
             <div className="admin-panel-header">
               <h2>Időpontfoglalások ({appointments.length})</h2>
+            </div>
+
+            <div className="google-sync-card">
+              {googleRedirectResult === "connected" && (
+                <div className="form-status success">Google Naptár sikeresen összekapcsolva.</div>
+              )}
+              {googleRedirectResult === "error" && (
+                <div className="form-status error">
+                  A Google összekapcsolás sikertelen volt, próbáld újra.
+                </div>
+              )}
+              {googleError && <div className="form-status error">{googleError}</div>}
+
+              {googleStatus && !googleStatus.configured && (
+                <p>
+                  A Google Naptár integráció nincs beállítva a szerveren (hiányzó
+                  GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI).
+                </p>
+              )}
+
+              {googleStatus?.configured && (
+                <div className="google-sync-row">
+                  <div>
+                    <strong>Google Naptár</strong>
+                    <span className={`google-sync-status ${googleStatus.connected ? "connected" : ""}`}>
+                      {googleStatus.connected ? "Összekapcsolva" : "Nincs összekapcsolva"}
+                    </span>
+                  </div>
+                  {googleStatus.connected ? (
+                    <button className="btn btn-outline btn-small" onClick={handleDisconnectGoogle}>
+                      Leválasztás
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-primary btn-small"
+                      onClick={handleConnectGoogle}
+                      disabled={connectingGoogle}
+                    >
+                      {connectingGoogle ? "Átirányítás…" : "Összekapcsolás"}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {appointmentsError && <div className="form-status error">{appointmentsError}</div>}
