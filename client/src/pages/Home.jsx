@@ -210,7 +210,7 @@ export default function Home() {
               <span>Év tapasztalat</span>
             </div>
             <div>
-              <strong>20+</strong>
+              <strong>22</strong>
               <span>Kiszolgált település</span>
             </div>
           </div>

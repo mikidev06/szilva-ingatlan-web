@@ -3,7 +3,7 @@ import MapEmbed from "../components/MapEmbed";
 
 const badges = [
   "Okleveles ingatlanközvetítő",
-  "11+ év tapasztalat",
+  "11 év tapasztalat",
   "Helyi piacismeret",
   "Újépítésű projektek teljeskörű kezelése",
   "Hitelügyintézés"
