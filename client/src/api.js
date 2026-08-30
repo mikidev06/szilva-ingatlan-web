@@ -70,6 +70,12 @@ export function formatSizeRange(min, max) {
   return `${min} – ${max} m²`;
 }
 
+export function formatRoomsRange(min, max) {
+  if (!min && !max) return "— szoba";
+  if (!max || max === min) return `${min || max} szoba`;
+  return `${min} – ${max} szoba`;
+}
+
 async function parseErrorMessage(res, fallback) {
   try {
     const data = await res.json();

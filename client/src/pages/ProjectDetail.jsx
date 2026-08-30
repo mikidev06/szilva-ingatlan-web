@@ -51,7 +51,11 @@ export default function ProjectDetail() {
                 <span>Alapterület</span>
               </div>
               <div className="detail-meta-item">
-                <strong>{project.rooms}</strong>
+                <strong>
+                  {!project.roomsMax || project.roomsMax === project.roomsMin
+                    ? project.roomsMin || project.roomsMax || "—"
+                    : `${project.roomsMin} – ${project.roomsMax}`}
+                </strong>
                 <span>Szoba</span>
               </div>
               <div className="detail-meta-item">

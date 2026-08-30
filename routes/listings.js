@@ -19,6 +19,8 @@ function buildListingData(body) {
   const priceMax = Number(body.priceMax) || 0;
   const sizeMin = Number(body.sizeMin) || 0;
   const sizeMax = Number(body.sizeMax) || 0;
+  const roomsMin = Number(body.roomsMin) || 0;
+  const roomsMax = Number(body.roomsMax) || 0;
 
   return {
     title: body.title,
@@ -32,7 +34,9 @@ function buildListingData(body) {
     size: kind === "projekt" ? sizeMin : Number(body.size) || 0,
     sizeMin: kind === "projekt" ? sizeMin : 0,
     sizeMax: kind === "projekt" ? sizeMax : 0,
-    rooms: Number(body.rooms) || 0,
+    rooms: kind === "projekt" ? roomsMin : Number(body.rooms) || 0,
+    roomsMin: kind === "projekt" ? roomsMin : 0,
+    roomsMax: kind === "projekt" ? roomsMax : 0,
     availableUnits: kind === "projekt" ? Number(body.availableUnits) || 0 : 0,
     description: body.description || "",
     featured: Boolean(body.featured),

@@ -14,6 +14,8 @@ const emptyForm = {
   sizeMin: "",
   sizeMax: "",
   rooms: "",
+  roomsMin: "",
+  roomsMax: "",
   availableUnits: "",
   description: "",
   featured: false,
@@ -36,6 +38,8 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           sizeMin: initial.sizeMin ?? "",
           sizeMax: initial.sizeMax ?? "",
           rooms: initial.rooms ?? "",
+          roomsMin: initial.roomsMin ?? "",
+          roomsMax: initial.roomsMax ?? "",
           availableUnits: initial.availableUnits ?? "",
           description: initial.description || "",
           featured: !!initial.featured,
@@ -127,6 +131,8 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
       sizeMin: Number(form.sizeMin) || 0,
       sizeMax: Number(form.sizeMax) || 0,
       rooms: Number(form.rooms) || 0,
+      roomsMin: Number(form.roomsMin) || 0,
+      roomsMax: Number(form.roomsMax) || 0,
       availableUnits: Number(form.availableUnits) || 0,
       images: [...existingImages, ...newImageUrls],
     });
@@ -272,17 +278,47 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           </div>
         )}
 
-        <div className="field">
-          <label htmlFor="af-rooms">Szobák száma</label>
-          <input
-            id="af-rooms"
-            name="rooms"
-            type="number"
-            min="0"
-            value={form.rooms}
-            onChange={handleChange}
-          />
-        </div>
+        {kind === "projekt" ? (
+          <>
+            <div className="field">
+              <label htmlFor="af-rooms-min">Szobák számától</label>
+              <input
+                id="af-rooms-min"
+                name="roomsMin"
+                type="number"
+                min="0"
+                value={form.roomsMin}
+                onChange={handleChange}
+                placeholder="Pl. 1"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="af-rooms-max">Szobák számáig</label>
+              <input
+                id="af-rooms-max"
+                name="roomsMax"
+                type="number"
+                min="0"
+                value={form.roomsMax}
+                onChange={handleChange}
+                placeholder="Pl. 4"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="field">
+            <label htmlFor="af-rooms">Szobák száma</label>
+            <input
+              id="af-rooms"
+              name="rooms"
+              type="number"
+              min="0"
+              value={form.rooms}
+              onChange={handleChange}
+            />
+          </div>
+        )}
 
         {kind === "projekt" && (
           <div className="field">

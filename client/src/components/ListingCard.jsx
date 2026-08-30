@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatPrice, formatPriceRange, formatSizeRange } from "../api";
+import { formatPrice, formatPriceRange, formatSizeRange, formatRoomsRange } from "../api";
 
 export default function ListingCard({ listing, basePath = "/ingatlanok" }) {
   const coverImage = listing.images?.[0];
@@ -27,7 +27,7 @@ export default function ListingCard({ listing, basePath = "/ingatlanok" }) {
         </div>
         <div className="listing-meta">
           <span>📐 {isProject ? formatSizeRange(listing.sizeMin, listing.sizeMax) : `${listing.size} m²`}</span>
-          <span>🛏 {listing.rooms} szoba</span>
+          <span>🛏 {isProject ? formatRoomsRange(listing.roomsMin, listing.roomsMax) : `${listing.rooms} szoba`}</span>
           <span>🏷 {listing.category}</span>
         </div>
       </div>

@@ -27,7 +27,12 @@ const listingSchema = new mongoose.Schema(
     size: { type: Number, default: 0, min: 0 },
     sizeMin: { type: Number, default: 0, min: 0 },
     sizeMax: { type: Number, default: 0, min: 0 },
+    // "ingatlan" eseten a rooms az egyetlen szobaszam; "projekt" eseten a
+    // rooms a roomsMin-nel egyezik meg (osszefoglalo ertekkent), a tenyleges
+    // szobaszam-sav megjelenitese a roomsMin/roomsMax parosbol tortenik.
     rooms: { type: Number, default: 0, min: 0 },
+    roomsMin: { type: Number, default: 0, min: 0 },
+    roomsMax: { type: Number, default: 0, min: 0 },
     // Csak "projekt" eseten hasznalt: hany lakas erheto meg jelenleg.
     availableUnits: { type: Number, default: 0, min: 0 },
     description: { type: String, default: "" },
