@@ -61,9 +61,8 @@ export default function Home() {
             <h1>Újépítésű ingatlant keres?</h1>
             <h2>Segítek megtalálni az ideális otthonát.</h2>
             <p>
-              Szilágyi Szilvia vagyok, ingatlanközvetítő.
-              Segítek Önnek ingatlanát gyorsan, átláthatóan és
-              stresszmentesen értékesíteni.
+              Szilágyi Szilvia vagyok, ingatlanközvetítő, hitelszakértő.
+              Segítek Önnek megtalálni az önhöz illő ingatlant.
             </p>
             <div className="hero-actions">
               <Link to="/ingatlanok" className="btn btn-primary">
