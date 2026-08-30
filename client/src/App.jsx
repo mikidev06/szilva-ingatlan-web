@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import Privacy from "./pages/Privacy";
 import Admin from "./pages/Admin";
+import NotFound from "./pages/NotFound";
 
 function PublicLayout() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/idopontfoglalas" element={<Booking />} />
         <Route path="/kapcsolat" element={<Contact />} />
         <Route path="/adatvedelem" element={<Privacy />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/admin" element={<Admin />} />
     </Routes>

@@ -1011,6 +1011,29 @@ button {
   color: var(--color-text-muted);
 }
 
+.not-found {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 60px 0;
+}
+
+.not-found .eyebrow {
+  margin-bottom: 12px;
+}
+
+.not-found p {
+  color: var(--color-text-muted);
+  margin: 16px 0 28px;
+}
+
+.not-found-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .detail-layout {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
