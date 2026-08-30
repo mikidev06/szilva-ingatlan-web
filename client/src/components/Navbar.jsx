@@ -19,7 +19,7 @@ export default function Navbar() {
       <div className="container navbar-inner">
         <NavLink to="/" className="brand" onClick={() => setOpen(false)}>
           <span className="brand-mark">SZ</span>
-          Szilágyi Szilvia
+          <span className="brand-name">Szilágyi Szilvia</span>
         </NavLink>
 
         <nav className={`nav-links ${open ? "open" : ""}`}>
@@ -34,13 +34,6 @@ export default function Navbar() {
               {link.label}
             </NavLink>
           ))}
-          <a
-            href="tel:+36305059660"
-            className="btn btn-primary nav-phone-btn nav-links-phone"
-            onClick={() => setOpen(false)}
-          >
-            +36 30 505 9660
-          </a>
         </nav>
 
         <div className="nav-actions">

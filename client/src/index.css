@@ -279,17 +279,6 @@ button {
   color: var(--color-primary-dark);
 }
 
-/* A "Szoveg szine" szabaly (.nav-links a) specificitasa magasabb, mint a
-   .nav-phone-btn-e, ezert a telefongomb sotet szoveget kapna a mobil
-   menuben - ez a szabaly ezt felulirja, hogy vilagos maradjon ott is. */
-.nav-links a.nav-phone-btn {
-  color: #fffdf8;
-}
-
-.nav-links-phone {
-  display: none;
-}
-
 .nav-actions {
   display: flex;
   align-items: center;
@@ -1445,13 +1434,17 @@ button {
     display: block;
   }
 
-  .nav-actions .btn-primary {
+  .brand-name {
     display: none;
   }
 
-  .nav-links-phone {
-    display: inline-flex;
-    margin-top: 4px;
+  .nav-phone-btn {
+    padding: 9px 14px;
+    font-size: 0.82rem;
+  }
+
+  .nav-actions {
+    gap: 10px;
   }
 
   .search-bar {
