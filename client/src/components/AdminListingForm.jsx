@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
+import { compressImage } from "../imageCompression";
 
 const emptyForm = {
   title: "",
@@ -53,20 +54,27 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
     }));
   }
 
-  function handleFilesSelected(e) {
+  async function handleFilesSelected(e) {
     const files = Array.from(e.target.files || []);
     e.target.value = "";
 
     for (const file of files) {
       const id = ++uploadIdCounter;
       const previewUrl = URL.createObjectURL(file);
-      setUploads((prev) => [...prev, { id, previewUrl, status: "uploading" }]);
+      setUploads((prev) => [...prev, { id, previewUrl, status: "compressing" }]);
 
-      upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/listings/blob-upload",
-        clientPayload: JSON.stringify({ token }),
-      })
+      compressImage(file)
+        .then((compressed) => {
+          setUploads((prev) =>
+            prev.map((u) => (u.id === id ? { ...u, status: "uploading" } : u))
+          );
+
+          return upload(compressed.name, compressed, {
+            access: "public",
+            handleUploadUrl: "/api/listings/blob-upload",
+            clientPayload: JSON.stringify({ token }),
+          });
+        })
         .then((blob) => {
           setUploads((prev) =>
             prev.map((u) => (u.id === id ? { ...u, status: "done", url: blob.url } : u))
@@ -94,7 +102,7 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
     });
   }
 
-  const isUploading = uploads.some((u) => u.status === "uploading");
+  const isUploading = uploads.some((u) => u.status === "uploading" || u.status === "compressing");
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -229,6 +237,9 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
               {uploads.map((u) => (
                 <div className="admin-image-thumb" key={u.id}>
                   <img src={u.previewUrl} alt="" />
+                  {u.status === "compressing" && (
+                    <div className="admin-image-status">Tömörítés…</div>
+                  )}
                   {u.status === "uploading" && (
                     <div className="admin-image-status">Feltöltés…</div>
                   )}

@@ -51,6 +51,8 @@ A `/admin` oldalon (pl. `http://localhost:5173/admin`) a `.env` fájlban beáll�
 
 Egy ingatlanhoz több fénykép is feltölthető közvetlenül a gépről. A képek [Vercel Blob](https://vercel.com/docs/vercel-blob)-ban tárolódnak, **közvetlenül a böngészőből** – nem a szerveren keresztül. Ennek oka, hogy a Vercel szerverless függvényeknek 4,5 MB-os kemény kérés-méret korlátjuk van (minden csomagon, ez nem konfigurálható), amit már 1-2 telefonos fénykép is simán túllépne. A böngésző a [`@vercel/blob/client`](https://vercel.com/docs/vercel-blob/client-upload) `upload()` függvényével tölti fel a fájlokat, a `POST /api/listings/blob-upload` végpont ([routes/listings.js](routes/listings.js)) csak egy rövid életű feltöltési tokent ad ki hozzá (az admin JWT-t ellenőrzi előtte). Ehhez a `.env` fájlban be kell állítani a `BLOB_READ_WRITE_TOKEN` értéket – lásd a "Telepítés Vercelre" szakaszt.
 
+Feltöltés előtt a böngésző minden képet automatikusan átméretez (max. 1920 px a hosszabb oldalon, az arányok megtartásával) és JPEG-ként újratömörít ([client/src/imageCompression.js](client/src/imageCompression.js)). Ez egységesen kicsi, gyorsan betöltődő fényképeket eredményez a telefonról készült, gyakran több MB-os eredeti fotókból is, torzítás vagy vágás nélkül.
+
 ## Cache
 
 A `GET /api/listings` és `GET /api/listings/:id` végpontok egy egyszerű, folyamaton belüli (in-memory) TTL cache-ben tárolják a válaszokat (60, illetve 300 másodpercig), létrehozáskor/módosításkor/törléskor pedig a szerver automatikusan érvényteleníti az érintett bejegyzéseket. Lásd [config/cache.js](config/cache.js).
