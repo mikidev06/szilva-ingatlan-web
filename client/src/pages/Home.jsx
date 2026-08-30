@@ -67,11 +67,11 @@ export default function Home() {
             </div>
             <div className="hero-stats">
               <div className="hero-stat">
-                <strong>120+</strong>
+                <strong>300+</strong>
                 <span>Sikeres tranzakció</span>
               </div>
               <div className="hero-stat">
-                <strong>10 év</strong>
+                <strong>11 év</strong>
                 <span>Szakmai tapasztalat</span>
               </div>
               <div className="hero-stat">
@@ -159,19 +159,19 @@ export default function Home() {
         <div className="container">
           <div className="stats-strip">
             <div>
-              <strong>250+</strong>
-              <span>Kezelt ingatlan</span>
+              <strong>1000+</strong>
+              <span>Kezelt megbízás</span>
             </div>
             <div>
-              <strong>120+</strong>
-              <span>Elégedett ügyfél</span>
+              <strong>200+</strong>
+              <span>Sikeres hitelesítés</span>
             </div>
             <div>
-              <strong>10</strong>
+              <strong>11</strong>
               <span>Év tapasztalat</span>
             </div>
             <div>
-              <strong>15</strong>
+              <strong>20+</strong>
               <span>Kiszolgált település</span>
             </div>
           </div>

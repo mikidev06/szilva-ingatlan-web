@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 
+const SLIDE_DURATION = 600;
+
 export default function Gallery({ images, title }) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [maximized, setMaximized] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [outgoing, setOutgoing] = useState(null); // { src, direction } | null
 
   const hasImages = images && images.length > 0;
   const hasMultiple = hasImages && images.length > 1;
@@ -12,15 +15,25 @@ export default function Gallery({ images, title }) {
   const prevIndex = hasImages ? (index - 1 + images.length) % images.length : 0;
   const nextIndex = hasImages ? (index + 1) % images.length : 0;
 
+  function changeTo(newIndex, dir) {
+    setOutgoing({ src: images[index], direction: dir });
+    setDirection(dir);
+    setIndex(newIndex);
+  }
+
   function goPrev() {
-    setDirection(-1);
-    setIndex(prevIndex);
+    changeTo(prevIndex, -1);
   }
 
   function goNext() {
-    setDirection(1);
-    setIndex(nextIndex);
+    changeTo(nextIndex, 1);
   }
+
+  useEffect(() => {
+    if (!outgoing) return;
+    const timer = setTimeout(() => setOutgoing(null), SLIDE_DURATION);
+    return () => clearTimeout(timer);
+  }, [outgoing]);
 
   useEffect(() => {
     if (!maximized) return;
@@ -40,11 +53,11 @@ export default function Gallery({ images, title }) {
     if (!hasMultiple || maximized || hovered) return;
 
     const timer = setTimeout(() => {
-      setDirection(1);
-      setIndex(nextIndex);
-    }, 5000);
+      changeTo(nextIndex, 1);
+    }, 3000);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMultiple, maximized, hovered, nextIndex]);
 
   if (!hasImages) {
@@ -75,12 +88,21 @@ export default function Gallery({ images, title }) {
         )}
 
         <div className="gallery-main">
+          {outgoing && (
+            <img
+              key={`out-${outgoing.src}`}
+              src={outgoing.src}
+              alt=""
+              aria-hidden="true"
+              className={outgoing.direction === 1 ? "gallery-slide-out-left" : "gallery-slide-out-right"}
+            />
+          )}
           <img
             key={index}
             src={images[index]}
             alt={`${title} – ${index + 1}. kép`}
             onClick={() => setMaximized(true)}
-            className={direction === 1 ? "gallery-slide-next" : "gallery-slide-prev"}
+            className={direction === 1 ? "gallery-slide-in-right" : "gallery-slide-in-left"}
           />
 
           {hasMultiple && (

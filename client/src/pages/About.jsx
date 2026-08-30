@@ -8,17 +8,17 @@ const badges = [
 ];
 
 const timeline = [
+ {
+    year: "2013",
+    text: "Budapesti Gazdasági Egyetemen (BGE) diplomáztam közgazdászként.",
+  },
   {
     year: "2014",
     text: "Elindítottam ingatlanközvetítői pályafutásomat.",
   },
   {
-    year: "2018",
-    text: "Saját ügyfélkört és irodát alakítottam ki.",
-  },
-  {
     year: "2024",
-    text: "250+ sikeresen lezárt ingatlanügylet áll mögöttem.",
+    text: "Már 300+ sikeres transzakciót bonyolítottam le és 1000+ megbízást kezeltem.",
   },
 ];
 
