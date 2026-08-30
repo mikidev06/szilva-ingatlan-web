@@ -49,12 +49,10 @@ export default function About() {
                 bizalommal élhessék meg.
               </p>
               <p className="agent-quote">
-                „Minden ügyfelemet úgy kezelem, mintha a saját otthonomról
-                lenne szó.”
+                „Az ügyfeleim elégedettsége a sikerem titka.”
               </p>
               <p>
-                11 éves tapasztalattal rendelkezem lakóingatlanok,
-                kereskedelmi ingatlanok és telkek közvetítésében,
+                11 éves tapasztalattal rendelkezem újépítésű projektek és ingatlanok közvetítésében,
                 elsősorban Budapesten és környékén.
               </p>
 
