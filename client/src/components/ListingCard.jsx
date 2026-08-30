@@ -12,11 +12,10 @@ export default function ListingCard({ listing }) {
         ) : (
           <div className="listing-media-empty">📷</div>
         )}
-        <span className="listing-tag">{listing.type}</span>
       </div>
       <div className="listing-body">
         <div className="listing-price">
-          {formatPrice(listing.price, listing.type)}
+          {formatPrice(listing.price)}
         </div>
         <h3 className="listing-title">{listing.title}</h3>
         <div className="listing-location">

@@ -11,7 +11,7 @@ export default function Footer() {
             <div className="footer-brand">Szilágyi Szilvia</div>
             <p>
               Több éves tapasztalattal segítek ügyfeleimnek sikeresen
-              értékesíteni vagy kiadni ingatlanukat.
+              értékesíteni ingatlanukat.
             </p>
           </div>
 
@@ -30,6 +30,9 @@ export default function Footer() {
               <li>
                 <Link to="/kapcsolat">Kapcsolat</Link>
               </li>
+              <li>
+                <Link to="/idopontfoglalas">Időpontfoglalás</Link>
+              </li>
             </ul>
           </div>
 
@@ -40,10 +43,10 @@ export default function Footer() {
                 <span>Ingatlan értékesítés</span>
               </li>
               <li>
-                <span>Ingatlan bérbeadás</span>
+                <span>Ingatlan értékbecslés</span>
               </li>
               <li>
-                <span>Ingatlan értékbecslés</span>
+                <span>Hitelügyintézés</span>
               </li>
               <li>
                 <span>Jogi ügyintézés</span>

@@ -10,7 +10,6 @@ export default function Listings() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const city = searchParams.get("city") || "";
-  const type = searchParams.get("type") || "";
   const category = searchParams.get("category") || "";
 
   useEffect(() => {
@@ -32,15 +31,14 @@ export default function Listings() {
 
   const filtered = useMemo(() => {
     return listings.filter((l) => {
-      if (type && l.type !== type) return false;
       if (category && l.category !== category) return false;
       if (city && !l.city.toLowerCase().includes(city.toLowerCase()))
         return false;
       return true;
     });
-  }, [listings, type, category, city]);
+  }, [listings, category, city]);
 
-  const hasActiveFilters = Boolean(city || type || category);
+  const hasActiveFilters = Boolean(city || category);
 
   return (
     <>
@@ -48,7 +46,7 @@ export default function Listings() {
         <div className="container">
           <span className="eyebrow">Ingatlanjaink</span>
           <h1>Böngésszen aktuális ajánlataink között</h1>
-          <p>Nézze meg jelenlegi eladó és kiadó ingatlanjainkat.</p>
+          <p>Nézze meg jelenlegi eladó ingatlanjainkat.</p>
         </div>
       </div>
 
@@ -64,18 +62,6 @@ export default function Listings() {
                 value={city}
                 onChange={(e) => updateFilter("city", e.target.value)}
               />
-            </div>
-            <div className="field">
-              <label htmlFor="f-type">Típus</label>
-              <select
-                id="f-type"
-                value={type}
-                onChange={(e) => updateFilter("type", e.target.value)}
-              >
-                <option value="">Összes</option>
-                <option value="Eladó">Eladó</option>
-                <option value="Kiadó">Kiadó</option>
-              </select>
             </div>
             <div className="field">
               <label htmlFor="f-category">Kategória</label>

@@ -65,16 +65,13 @@ export default function ListingDetail() {
           </div>
 
           <div className="sidebar-card">
-            <span className="listing-tag" style={{ position: "static", display: "inline-block", marginBottom: 12 }}>
-              {listing.type}
-            </span>
             <h1 style={{ fontSize: "1.4rem" }}>{listing.title}</h1>
             <div className="listing-location" style={{ marginBottom: 16 }}>
               📍 {listing.city}
               {listing.address ? `, ${listing.address}` : ""}
             </div>
             <div className="listing-price" style={{ fontSize: "1.6rem", marginBottom: 20 }}>
-              {formatPrice(listing.price, listing.type)}
+              {formatPrice(listing.price)}
             </div>
 
             <Link to="/kapcsolat" className="btn btn-primary btn-block">

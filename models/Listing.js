@@ -3,11 +3,6 @@ import mongoose from "mongoose";
 const listingSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
-    type: {
-      type: String,
-      enum: ["Eladó", "Kiadó"],
-      default: "Eladó",
-    },
     category: {
       type: String,
       enum: ["Lakás", "Ház", "Telek", "Iroda", "Nyaraló"],

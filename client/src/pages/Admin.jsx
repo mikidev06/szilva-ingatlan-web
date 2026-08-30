@@ -9,6 +9,8 @@ import {
   createListing,
   updateListing,
   deleteListing,
+  fetchAppointments,
+  deleteAppointment,
   formatPrice,
 } from "../api";
 
@@ -22,6 +24,8 @@ export default function Admin() {
   const [loginError, setLoginError] = useState(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
+  const [view, setView] = useState("listings"); // "listings" | "appointments"
+
   const [listings, setListings] = useState([]);
   const [loadingListings, setLoadingListings] = useState(false);
   const [listError, setListError] = useState(null);
@@ -29,6 +33,12 @@ export default function Admin() {
   const [editing, setEditing] = useState(null); // null | "new" | listing object
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState(null);
+
+  const [appointments, setAppointments] = useState([]);
+  // Igazra inditjuk, hogy elso megnyitaskor ne villanjon fel tevesen az
+  // "ures" allapot, mielott a tenyleges lekerdezes lefutna.
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
+  const [appointmentsError, setAppointmentsError] = useState(null);
 
   useEffect(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
@@ -53,6 +63,12 @@ export default function Admin() {
     }
   }, [token]);
 
+  useEffect(() => {
+    if (token && view === "appointments") {
+      loadAppointments();
+    }
+  }, [token, view]);
+
   function loadListings() {
     setLoadingListings(true);
     setListError(null);
@@ -60,6 +76,15 @@ export default function Admin() {
       .then(setListings)
       .catch(() => setListError("Nem sikerült betölteni az ingatlanokat."))
       .finally(() => setLoadingListings(false));
+  }
+
+  function loadAppointments() {
+    setLoadingAppointments(true);
+    setAppointmentsError(null);
+    fetchAppointments(token)
+      .then(setAppointments)
+      .catch(() => setAppointmentsError("Nem sikerült betölteni a foglalásokat."))
+      .finally(() => setLoadingAppointments(false));
   }
 
   async function handleLogin(e) {
@@ -82,6 +107,7 @@ export default function Admin() {
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setListings([]);
+    setAppointments([]);
   }
 
   async function handleFormSubmit(payload) {
@@ -109,6 +135,18 @@ export default function Admin() {
       loadListings();
     } catch (err) {
       setListError(err.message);
+    }
+  }
+
+  async function handleCancelAppointment(appointment) {
+    if (!window.confirm(`Biztosan lemondod ${appointment.name} időpontját (${appointment.date} ${appointment.time})?`)) {
+      return;
+    }
+    try {
+      await deleteAppointment(token, appointment._id);
+      loadAppointments();
+    } catch (err) {
+      setAppointmentsError(err.message);
     }
   }
 
@@ -158,7 +196,7 @@ export default function Admin() {
         <div className="admin-header">
           <div>
             <span className="eyebrow">Admin felület</span>
-            <h1>Ingatlanok kezelése</h1>
+            <h1>{view === "listings" ? "Ingatlanok kezelése" : "Időpontfoglalások"}</h1>
           </div>
           <div className="admin-header-actions">
             <Link to="/" className="btn btn-outline">
@@ -171,70 +209,149 @@ export default function Admin() {
           </div>
         </div>
 
-        {editing ? (
-          <div className="admin-panel">
-            <h2>{editing === "new" ? "Új ingatlan hozzáadása" : "Ingatlan szerkesztése"}</h2>
-            {formError && <div className="form-status error">{formError}</div>}
-            <AdminListingForm
-              initial={editing === "new" ? null : editing}
-              token={token}
-              onSubmit={handleFormSubmit}
-              onCancel={() => {
-                setEditing(null);
-                setFormError(null);
-              }}
-              submitting={saving}
-            />
+        {!editing && (
+          <div className="admin-tabs">
+            <button
+              type="button"
+              className={`admin-tab ${view === "listings" ? "active" : ""}`}
+              onClick={() => setView("listings")}
+            >
+              Ingatlanok
+            </button>
+            <button
+              type="button"
+              className={`admin-tab ${view === "appointments" ? "active" : ""}`}
+              onClick={() => setView("appointments")}
+            >
+              Időpontfoglalások
+            </button>
           </div>
-        ) : (
+        )}
+
+        {view === "listings" && (
+          <>
+            {editing ? (
+              <div className="admin-panel">
+                <h2>{editing === "new" ? "Új ingatlan hozzáadása" : "Ingatlan szerkesztése"}</h2>
+                {formError && <div className="form-status error">{formError}</div>}
+                <AdminListingForm
+                  initial={editing === "new" ? null : editing}
+                  token={token}
+                  onSubmit={handleFormSubmit}
+                  onCancel={() => {
+                    setEditing(null);
+                    setFormError(null);
+                  }}
+                  submitting={saving}
+                />
+              </div>
+            ) : (
+              <div className="admin-panel">
+                <div className="admin-panel-header">
+                  <h2>Ingatlanok ({listings.length})</h2>
+                  <button className="btn btn-primary" onClick={() => setEditing("new")}>
+                    + Új ingatlan
+                  </button>
+                </div>
+
+                {listError && <div className="form-status error">{listError}</div>}
+                {loadingListings && <div className="loading-state">Betöltés…</div>}
+
+                {!loadingListings && listings.length === 0 && !listError && (
+                  <div className="empty-state">Még nincs felvett ingatlan.</div>
+                )}
+
+                {!loadingListings && listings.length > 0 && (
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Cím</th>
+                          <th>Kategória</th>
+                          <th>Település</th>
+                          <th>Ár</th>
+                          <th>Kiemelt</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {listings.map((listing) => (
+                          <tr key={listing._id}>
+                            <td>{listing.title}</td>
+                            <td>{listing.category}</td>
+                            <td>{listing.city}</td>
+                            <td>{formatPrice(listing.price)}</td>
+                            <td>{listing.featured ? "Igen" : "—"}</td>
+                            <td className="admin-table-actions">
+                              <button
+                                className="btn btn-outline btn-small"
+                                onClick={() => setEditing(listing)}
+                              >
+                                Szerkesztés
+                              </button>
+                              <button
+                                className="btn btn-danger btn-small"
+                                onClick={() => handleDelete(listing)}
+                              >
+                                Törlés
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {view === "appointments" && (
           <div className="admin-panel">
             <div className="admin-panel-header">
-              <h2>Ingatlanok ({listings.length})</h2>
-              <button className="btn btn-primary" onClick={() => setEditing("new")}>
-                + Új ingatlan
-              </button>
+              <h2>Időpontfoglalások ({appointments.length})</h2>
             </div>
 
-            {listError && <div className="form-status error">{listError}</div>}
-            {loadingListings && <div className="loading-state">Betöltés…</div>}
+            {appointmentsError && <div className="form-status error">{appointmentsError}</div>}
+            {loadingAppointments && <div className="loading-state">Betöltés…</div>}
 
-            {!loadingListings && listings.length === 0 && !listError && (
-              <div className="empty-state">Még nincs felvett ingatlan.</div>
+            {!loadingAppointments && appointments.length === 0 && !appointmentsError && (
+              <div className="empty-state">Jelenleg nincs foglalás.</div>
             )}
 
-            {!loadingListings && listings.length > 0 && (
+            {!loadingAppointments && appointments.length > 0 && (
               <div className="admin-table-wrap">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Cím</th>
-                      <th>Típus</th>
-                      <th>Település</th>
-                      <th>Ár</th>
-                      <th>Kiemelt</th>
+                      <th>Dátum</th>
+                      <th>Idő</th>
+                      <th>Szolgáltatás</th>
+                      <th>Név</th>
+                      <th>Elérhetőség</th>
+                      <th>Megjegyzés</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {listings.map((listing) => (
-                      <tr key={listing._id}>
-                        <td>{listing.title}</td>
-                        <td>{listing.type}</td>
-                        <td>{listing.city}</td>
-                        <td>{formatPrice(listing.price, listing.type)}</td>
-                        <td>{listing.featured ? "Igen" : "—"}</td>
+                    {appointments.map((appt) => (
+                      <tr key={appt._id}>
+                        <td>{appt.date}</td>
+                        <td>{appt.time}</td>
+                        <td>{appt.serviceType}</td>
+                        <td>{appt.name}</td>
+                        <td>
+                          <div>{appt.email}</div>
+                          {appt.phone && <div>{appt.phone}</div>}
+                        </td>
+                        <td>{appt.notes || "—"}</td>
                         <td className="admin-table-actions">
                           <button
-                            className="btn btn-outline btn-small"
-                            onClick={() => setEditing(listing)}
-                          >
-                            Szerkesztés
-                          </button>
-                          <button
                             className="btn btn-danger btn-small"
-                            onClick={() => handleDelete(listing)}
+                            onClick={() => handleCancelAppointment(appt)}
                           >
-                            Törlés
+                            Lemondás
                           </button>
                         </td>
                       </tr>

@@ -10,7 +10,6 @@ dotenv.config();
 const sampleListings = [
   {
     title: "Napfényes családi ház a Rózsadombon",
-    type: "Eladó",
     category: "Ház",
     price: 89000000,
     city: "Budapest",
@@ -28,7 +27,6 @@ const sampleListings = [
   },
   {
     title: "Modern lakás a belvárosban",
-    type: "Eladó",
     category: "Lakás",
     price: 62000000,
     city: "Debrecen",
@@ -44,22 +42,19 @@ const sampleListings = [
     featured: true,
   },
   {
-    title: "Kertes családi ház kiadó",
-    type: "Kiadó",
+    title: "Kertes családi ház Szegeden",
     category: "Ház",
-    price: 280000,
+    price: 42000000,
     city: "Szeged",
     address: "Minta köz 8.",
     size: 120,
     rooms: 4,
-    description:
-      "Hosszútávra kiadó, bútorozott családi ház, garázzsal és tárolóval.",
-    images: ["https://placehold.co/900x600?text=Kiad%C3%B3+H%C3%A1z"],
+    description: "Bútorozott családi ház, garázzsal és tárolóval.",
+    images: ["https://placehold.co/900x600?text=Csal%C3%A1di+H%C3%A1z"],
     featured: false,
   },
   {
     title: "Építési telek panorámás kilátással",
-    type: "Eladó",
     category: "Telek",
     price: 24000000,
     city: "Balatonfüred",
@@ -75,10 +70,9 @@ const sampleListings = [
     featured: false,
   },
   {
-    title: "Belvárosi iroda kiadó",
-    type: "Kiadó",
+    title: "Belvárosi irodahelyiség",
     category: "Iroda",
-    price: 450000,
+    price: 68000000,
     city: "Budapest",
     address: "Minta körút 22.",
     size: 95,
@@ -94,7 +88,6 @@ const sampleListings = [
   },
   {
     title: "Nyaraló a Balaton partján",
-    type: "Eladó",
     category: "Nyaraló",
     price: 55000000,
     city: "Siófok",

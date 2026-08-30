@@ -16,7 +16,6 @@ const itemCacheKey = (id) => `listings:${id}`;
 function buildListingData(body) {
   return {
     title: body.title,
-    type: body.type,
     category: body.category,
     price: Number(body.price) || 0,
     city: body.city,

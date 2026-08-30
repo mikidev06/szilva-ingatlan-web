@@ -4,7 +4,6 @@ import { compressImage } from "../imageCompression";
 
 const emptyForm = {
   title: "",
-  type: "Eladó",
   category: "Lakás",
   price: "",
   city: "",
@@ -22,7 +21,6 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
     initial
       ? {
           title: initial.title || "",
-          type: initial.type || "Eladó",
           category: initial.category || "Lakás",
           price: initial.price ?? "",
           city: initial.city || "",
@@ -132,14 +130,6 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
             onChange={handleChange}
             placeholder="Pl. Napfényes családi ház a Rózsadombon"
           />
-        </div>
-
-        <div className="field">
-          <label htmlFor="af-type">Típus</label>
-          <select id="af-type" name="type" value={form.type} onChange={handleChange}>
-            <option value="Eladó">Eladó</option>
-            <option value="Kiadó">Kiadó</option>
-          </select>
         </div>
 
         <div className="field">

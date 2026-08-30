@@ -11,14 +11,14 @@ const services = [
     text: "Teljes körű ügyintézés a hirdetéstől az adásvételi szerződésig, hogy Ön a lehető legjobb áron, gyorsan adhassa el ingatlanát.",
   },
   {
-    icon: "🔑",
-    title: "Ingatlan bérbeadás",
-    text: "Megbízható bérlők közvetítése, szerződéskötés és teljes körű ügyintézés a bérbeadás során.",
-  },
-  {
     icon: "📊",
     title: "Ingatlan értékbecslés",
     text: "Piaci alapú, pontos értékbecslés néhány napon belül, hogy reális áron hirdethesse meg ingatlanát.",
+  },
+  {
+    icon: "🏦",
+    title: "Hitelügyintézés",
+    text: "Segítek eligazodni a lakáshitel-lehetőségek között, és végigkísérem a teljes hitelügyintézési folyamatot.",
   },
 ];
 
@@ -28,7 +28,6 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [location, setLocation] = useState("");
-  const [type, setType] = useState("");
   const [category, setCategory] = useState("");
 
   useEffect(() => {
@@ -42,7 +41,6 @@ export default function Home() {
     e.preventDefault();
     const params = new URLSearchParams();
     if (location) params.set("city", location);
-    if (type) params.set("type", type);
     if (category) params.set("category", category);
     navigate(`/ingatlanok${params.toString() ? `?${params.toString()}` : ""}`);
   }
@@ -53,11 +51,11 @@ export default function Home() {
         <div className="container hero-inner">
           <div className="hero-copy">
             <span className="eyebrow">Ingatlanközvetítés bizalommal</span>
-            <h1>Adja el vagy adja ki ingatlanát magabiztosan</h1>
+            <h1>Adja el ingatlanát magabiztosan</h1>
             <p>
               Szilágyi Szilvia vagyok, ingatlanközvetítő.
               Segítek Önnek ingatlanát gyorsan, átláthatóan és
-              stresszmentesen értékesíteni vagy kiadni.
+              stresszmentesen értékesíteni.
             </p>
             <div className="hero-actions">
               <Link to="/ingatlanok" className="btn btn-primary">
@@ -107,18 +105,6 @@ export default function Home() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
-          </div>
-          <div className="field">
-            <label htmlFor="q-type">Típus</label>
-            <select
-              id="q-type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              <option value="">Összes</option>
-              <option value="Eladó">Eladó</option>
-              <option value="Kiadó">Kiadó</option>
-            </select>
           </div>
           <div className="field">
             <label htmlFor="q-category">Kategória</label>
@@ -219,7 +205,7 @@ export default function Home() {
               Vegye fel velem a kapcsolatot egy ingyenes, nem kötelező
               érvényű konzultációért.
             </p>
-            <Link to="/kapcsolat" className="btn btn-primary">
+            <Link to="/idopontfoglalas" className="btn btn-primary">
               Időpontot kérek
             </Link>
           </div>

@@ -6,6 +6,7 @@ const links = [
   { to: "/", label: "Főoldal" },
   { to: "/ingatlanok", label: "Ingatlanok" },
   { to: "/rolam", label: "Rólam" },
+  { to: "/idopontfoglalas", label: "Időpontfoglalás" },
   { to: "/kapcsolat", label: "Kapcsolat" },
 ];
 
@@ -34,7 +35,7 @@ export default function Navbar() {
           ))}
           <a
             href="tel:+36305059660"
-            className="btn btn-primary nav-links-phone"
+            className="btn btn-primary nav-phone-btn nav-links-phone"
             onClick={() => setOpen(false)}
           >
             +36 30 505 9660
@@ -42,7 +43,7 @@ export default function Navbar() {
         </nav>
 
         <div className="nav-actions">
-          <a href="tel:+36305059660" className="btn btn-primary">
+          <a href="tel:+36305059660" className="btn btn-primary nav-phone-btn">
             +36 30 505 9660
           </a>
           <ThemeToggle />

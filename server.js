@@ -12,6 +12,7 @@ import { connectCache } from "./config/cache.js";
 import listingsRouter from "./routes/listings.js";
 import messagesRouter from "./routes/messages.js";
 import authRouter from "./routes/auth.js";
+import appointmentsRouter from "./routes/appointments.js";
 
 dotenv.config();
 
@@ -84,6 +85,7 @@ const messagesLimiter = rateLimit({
 app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/listings", listingsRouter);
 app.use("/api/messages", messagesLimiter, messagesRouter);
+app.use("/api/appointments", appointmentsRouter);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

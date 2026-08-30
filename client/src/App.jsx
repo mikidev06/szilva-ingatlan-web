@@ -6,6 +6,7 @@ import Listings from "./pages/Listings";
 import ListingDetail from "./pages/ListingDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Booking from "./pages/Booking";
 import Admin from "./pages/Admin";
 
 function PublicLayout() {
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/ingatlanok" element={<Listings />} />
         <Route path="/ingatlanok/:id" element={<ListingDetail />} />
         <Route path="/rolam" element={<About />} />
+        <Route path="/idopontfoglalas" element={<Booking />} />
         <Route path="/kapcsolat" element={<Contact />} />
       </Route>
       <Route path="/admin" element={<Admin />} />

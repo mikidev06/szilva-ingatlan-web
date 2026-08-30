@@ -22,18 +22,16 @@ export async function sendMessage(payload) {
   return res.json();
 }
 
-export function formatPrice(value, type) {
-  const suffix = type === "Kiadó" ? " / hó" : "";
-
+export function formatPrice(value) {
   if (value >= 1_000_000_000) {
-    return `${formatRounded(value / 1_000_000_000)} Mrd Ft${suffix}`;
+    return `${formatRounded(value / 1_000_000_000)} Mrd Ft`;
   }
 
   if (value >= 1_000_000) {
-    return `${formatRounded(value / 1_000_000)} M Ft${suffix}`;
+    return `${formatRounded(value / 1_000_000)} M Ft`;
   }
 
-  return `${new Intl.NumberFormat("hu-HU").format(value)} Ft${suffix}`;
+  return `${new Intl.NumberFormat("hu-HU").format(value)} Ft`;
 }
 
 function formatRounded(amount) {
@@ -105,6 +103,43 @@ export async function deleteListing(token, id) {
   });
   if (!res.ok) {
     throw new Error(await parseErrorMessage(res, "Nem sikerült törölni az ingatlant."));
+  }
+  return res.json();
+}
+
+export async function fetchAvailability(date) {
+  const res = await fetch(`${BASE_URL}/appointments/availability?date=${date}`);
+  if (!res.ok) throw new Error("Nem sikerült betölteni az időpontokat.");
+  return res.json();
+}
+
+export async function createAppointment(payload) {
+  const res = await fetch(`${BASE_URL}/appointments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "Nem sikerült lefoglalni az időpontot."));
+  }
+  return res.json();
+}
+
+export async function fetchAppointments(token) {
+  const res = await fetch(`${BASE_URL}/appointments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Nem sikerült betölteni a foglalásokat.");
+  return res.json();
+}
+
+export async function deleteAppointment(token, id) {
+  const res = await fetch(`${BASE_URL}/appointments/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "Nem sikerült törölni a foglalást."));
   }
   return res.json();
 }

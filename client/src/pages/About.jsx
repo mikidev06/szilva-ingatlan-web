@@ -43,8 +43,8 @@ export default function About() {
               <span className="eyebrow">Rólam</span>
               <h2>Több mint egy ingatlanközvetítő</h2>
               <p>
-                Hiszek abban, hogy egy ingatlan eladása vagy bérbeadása
-                nem csupán üzlet, hanem fontos életesemény. Célom, hogy
+                Hiszek abban, hogy egy ingatlan eladása nem csupán üzlet,
+                hanem fontos életesemény. Célom, hogy
                 ügyfeleim ezt a folyamatot nyugodtan, átláthatóan és
                 bizalommal élhessék meg.
               </p>
