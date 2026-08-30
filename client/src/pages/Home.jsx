@@ -8,12 +8,12 @@ const services = [
   {
     icon: "🏠",
     title: "Ingatlan értékesítés",
-    text: "Teljes körű ügyintézés a hirdetéstől az adásvételi szerződésig, hogy Ön a lehető legjobb áron, gyorsan adhassa el ingatlanát.",
+    text: "Teljes körű ügyintézés az első megtekintéstől az adásvételi szerződésen keresztül a birtokbaadásig.",
   },
   {
     icon: "🏗️",
     title: "Projektértékesítés",
-    text: "Új építésű lakóparkok és fejlesztési projektek értékesítésében is segítek, az első egyeztetéstől a kulcsátadásig.",
+    text: "Új építésű lakóparkok és fejlesztési projektek értékesítése az első egyeztetéstől a kulcsátadásig.",
   },
   {
     icon: "🏦",
