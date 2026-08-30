@@ -83,7 +83,7 @@ export default function Contact() {
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="+36 30 505 9660"
+                placeholder="+36 12 345 6789"
               />
             </div>
 
@@ -109,8 +109,9 @@ export default function Contact() {
             <span className="eyebrow">Elérhetőségek</span>
             <h2>Forduljon hozzám bizalommal</h2>
             <p>
-              Hétköznapokon 9:00 és 18:00 között állok rendelkezésére, de
-              e-mailben bármikor elérhet.
+              Hétköznapokon 9:00 és 18:00 között állok rendelkezésére,
+              <br></br>
+              de e-mailben bármikor elérhet.
             </p>
 
             <div className="contact-info-list">
