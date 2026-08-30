@@ -14,6 +14,7 @@
   --color-nav-bg: rgba(250, 246, 239, 0.92);
   --color-hero-gradient: #f3ead7;
   --color-card-float-bg: rgba(255, 255, 255, 0.94);
+  --color-contrast-band: #241f19;
   --shadow-soft: 0 10px 30px rgba(43, 38, 32, 0.08);
   --shadow-hover: 0 16px 40px rgba(43, 38, 32, 0.14);
   --radius: 14px;
@@ -664,7 +665,7 @@ button {
 /* CTA */
 
 .cta-band {
-  background: var(--color-text);
+  background: var(--color-contrast-band);
   color: #fff;
   border-radius: var(--radius);
   padding: 56px 40px;
@@ -786,7 +787,7 @@ button {
 /* Footer */
 
 .footer {
-  background: #241f19;
+  background: var(--color-contrast-band);
   color: rgba(255, 255, 255, 0.72);
   margin-top: auto;
   padding: 56px 0 24px;
