@@ -352,9 +352,13 @@ button {
 
 .hero {
   position: relative;
-  padding: 20px 0 100px;
+  padding: 20px 0 20px;
   overflow: hidden;
   background: linear-gradient(180deg, var(--color-hero-gradient) 0%, var(--color-bg) 100%);
+}
+
+.hero + .section {
+  padding-top: 14px;
 }
 
 .hero-inner {
