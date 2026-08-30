@@ -11,6 +11,8 @@ import {
   deleteListing,
   fetchAppointments,
   deleteAppointment,
+  fetchMessages,
+  deleteMessage,
   formatPrice,
 } from "../api";
 
@@ -24,7 +26,7 @@ export default function Admin() {
   const [loginError, setLoginError] = useState(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const [view, setView] = useState("listings"); // "listings" | "appointments"
+  const [view, setView] = useState("listings"); // "listings" | "appointments" | "messages"
 
   const [listings, setListings] = useState([]);
   const [loadingListings, setLoadingListings] = useState(false);
@@ -39,6 +41,10 @@ export default function Admin() {
   // "ures" allapot, mielott a tenyleges lekerdezes lefutna.
   const [loadingAppointments, setLoadingAppointments] = useState(true);
   const [appointmentsError, setAppointmentsError] = useState(null);
+
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [messagesError, setMessagesError] = useState(null);
 
   useEffect(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
@@ -69,6 +75,12 @@ export default function Admin() {
     }
   }, [token, view]);
 
+  useEffect(() => {
+    if (token && view === "messages") {
+      loadMessages();
+    }
+  }, [token, view]);
+
   function loadListings() {
     setLoadingListings(true);
     setListError(null);
@@ -85,6 +97,15 @@ export default function Admin() {
       .then(setAppointments)
       .catch(() => setAppointmentsError("Nem sikerült betölteni a foglalásokat."))
       .finally(() => setLoadingAppointments(false));
+  }
+
+  function loadMessages() {
+    setLoadingMessages(true);
+    setMessagesError(null);
+    fetchMessages(token)
+      .then(setMessages)
+      .catch(() => setMessagesError("Nem sikerült betölteni az üzeneteket."))
+      .finally(() => setLoadingMessages(false));
   }
 
   async function handleLogin(e) {
@@ -108,6 +129,7 @@ export default function Admin() {
     setToken(null);
     setListings([]);
     setAppointments([]);
+    setMessages([]);
   }
 
   async function handleFormSubmit(payload) {
@@ -147,6 +169,16 @@ export default function Admin() {
       loadAppointments();
     } catch (err) {
       setAppointmentsError(err.message);
+    }
+  }
+
+  async function handleDeleteMessage(msg) {
+    if (!window.confirm(`Biztosan törlöd ${msg.name} üzenetét?`)) return;
+    try {
+      await deleteMessage(token, msg._id);
+      loadMessages();
+    } catch (err) {
+      setMessagesError(err.message);
     }
   }
 
@@ -196,7 +228,11 @@ export default function Admin() {
         <div className="admin-header">
           <div>
             <span className="eyebrow">Admin felület</span>
-            <h1>{view === "listings" ? "Ingatlanok kezelése" : "Időpontfoglalások"}</h1>
+            <h1>
+              {view === "listings" && "Ingatlanok kezelése"}
+              {view === "appointments" && "Időpontfoglalások"}
+              {view === "messages" && "Üzenetek"}
+            </h1>
           </div>
           <div className="admin-header-actions">
             <Link to="/" className="btn btn-outline">
@@ -224,6 +260,13 @@ export default function Admin() {
               onClick={() => setView("appointments")}
             >
               Időpontfoglalások
+            </button>
+            <button
+              type="button"
+              className={`admin-tab ${view === "messages" ? "active" : ""}`}
+              onClick={() => setView("messages")}
+            >
+              Üzenetek
             </button>
           </div>
         )}
@@ -352,6 +395,58 @@ export default function Admin() {
                             onClick={() => handleCancelAppointment(appt)}
                           >
                             Lemondás
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {view === "messages" && (
+          <div className="admin-panel">
+            <div className="admin-panel-header">
+              <h2>Üzenetek ({messages.length})</h2>
+            </div>
+
+            {messagesError && <div className="form-status error">{messagesError}</div>}
+            {loadingMessages && <div className="loading-state">Betöltés…</div>}
+
+            {!loadingMessages && messages.length === 0 && !messagesError && (
+              <div className="empty-state">Még nem érkezett üzenet.</div>
+            )}
+
+            {!loadingMessages && messages.length > 0 && (
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Dátum</th>
+                      <th>Név</th>
+                      <th>Elérhetőség</th>
+                      <th>Üzenet</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {messages.map((msg) => (
+                      <tr key={msg._id}>
+                        <td>{new Date(msg.createdAt).toLocaleString("hu-HU")}</td>
+                        <td>{msg.name}</td>
+                        <td>
+                          <div>{msg.email}</div>
+                          {msg.phone && <div>{msg.phone}</div>}
+                        </td>
+                        <td>{msg.message}</td>
+                        <td className="admin-table-actions">
+                          <button
+                            className="btn btn-danger btn-small"
+                            onClick={() => handleDeleteMessage(msg)}
+                          >
+                            Törlés
                           </button>
                         </td>
                       </tr>

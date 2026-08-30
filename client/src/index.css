@@ -910,6 +910,43 @@ button {
   cursor: zoom-in;
 }
 
+.gallery-slide-next {
+  animation: gallery-slide-from-right 0.45s ease;
+}
+
+.gallery-slide-prev {
+  animation: gallery-slide-from-left 0.45s ease;
+}
+
+@keyframes gallery-slide-from-right {
+  from {
+    transform: translateX(48px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes gallery-slide-from-left {
+  from {
+    transform: translateX(-48px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-slide-next,
+  .gallery-slide-prev {
+    animation: none;
+  }
+}
+
 .gallery-side-thumb {
   flex: 0 0 auto;
   width: 15%;

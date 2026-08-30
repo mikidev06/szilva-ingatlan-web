@@ -12,7 +12,7 @@ const services = [
   },
   {
     icon: "🏗️",
-    title: "Projektépítkezés",
+    title: "Projektértékesítés",
     text: "Új építésű lakóparkok és fejlesztési projektek értékesítésében is segítek, az első egyeztetéstől a kulcsátadásig.",
   },
   {

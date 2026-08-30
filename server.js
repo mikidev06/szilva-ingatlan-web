@@ -74,17 +74,9 @@ const authLimiter = rateLimit({
   message: { message: "Tul sok probalkozas, kerjuk probald ujra kesobb." },
 });
 
-const messagesLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  limit: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: "Tul sok uzenet, kerjuk probald ujra kesobb." },
-});
-
 app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/listings", listingsRouter);
-app.use("/api/messages", messagesLimiter, messagesRouter);
+app.use("/api/messages", messagesRouter);
 app.use("/api/appointments", appointmentsRouter);
 
 app.get("/api/health", (req, res) => {

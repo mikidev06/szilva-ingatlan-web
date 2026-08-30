@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 
 export default function Gallery({ images, title }) {
   const [index, setIndex] = useState(0);
-  const [focused, setFocused] = useState(false);
+  const [direction, setDirection] = useState(1);
+  const [maximized, setMaximized] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const hasImages = images && images.length > 0;
   const hasMultiple = hasImages && images.length > 1;
@@ -11,18 +13,20 @@ export default function Gallery({ images, title }) {
   const nextIndex = hasImages ? (index + 1) % images.length : 0;
 
   function goPrev() {
+    setDirection(-1);
     setIndex(prevIndex);
   }
 
   function goNext() {
+    setDirection(1);
     setIndex(nextIndex);
   }
 
   useEffect(() => {
-    if (!focused) return;
+    if (!maximized) return;
 
     function handleKeyDown(e) {
-      if (e.key === "Escape") setFocused(false);
+      if (e.key === "Escape") setMaximized(false);
       if (e.key === "ArrowLeft") goPrev();
       if (e.key === "ArrowRight") goNext();
     }
@@ -30,7 +34,18 @@ export default function Gallery({ images, title }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focused, prevIndex, nextIndex]);
+  }, [maximized, prevIndex, nextIndex]);
+
+  useEffect(() => {
+    if (!hasMultiple || maximized || hovered) return;
+
+    const timer = setTimeout(() => {
+      setDirection(1);
+      setIndex(nextIndex);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [hasMultiple, maximized, hovered, nextIndex]);
 
   if (!hasImages) {
     return (
@@ -43,7 +58,11 @@ export default function Gallery({ images, title }) {
 
   return (
     <>
-      <div className="gallery">
+      <div
+        className="gallery"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         {hasMultiple && (
           <button
             type="button"
@@ -57,9 +76,11 @@ export default function Gallery({ images, title }) {
 
         <div className="gallery-main">
           <img
+            key={index}
             src={images[index]}
             alt={`${title} – ${index + 1}. kép`}
-            onClick={() => setFocused(true)}
+            onClick={() => setMaximized(true)}
+            className={direction === 1 ? "gallery-slide-next" : "gallery-slide-prev"}
           />
 
           {hasMultiple && (
@@ -99,12 +120,12 @@ export default function Gallery({ images, title }) {
         )}
       </div>
 
-      {focused && (
-        <div className="lightbox" onClick={() => setFocused(false)}>
+      {maximized && (
+        <div className="lightbox" onClick={() => setMaximized(false)}>
           <button
             type="button"
             className="lightbox-close"
-            onClick={() => setFocused(false)}
+            onClick={() => setMaximized(false)}
             aria-label="Bezárás"
           >
             ✕

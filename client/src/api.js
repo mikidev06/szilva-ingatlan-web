@@ -22,6 +22,25 @@ export async function sendMessage(payload) {
   return res.json();
 }
 
+export async function fetchMessages(token) {
+  const res = await fetch(`${BASE_URL}/messages`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Nem sikerült betölteni az üzeneteket.");
+  return res.json();
+}
+
+export async function deleteMessage(token, id) {
+  const res = await fetch(`${BASE_URL}/messages/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "Nem sikerült törölni az üzenetet."));
+  }
+  return res.json();
+}
+
 export function formatPrice(value) {
   if (value >= 1_000_000_000) {
     return `${formatRounded(value / 1_000_000_000)} Mrd Ft`;

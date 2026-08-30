@@ -119,6 +119,8 @@ A szerver ezen kívül tartalmaz:
 - `PUT /api/listings/:id` – ingatlan módosítása (admin)
 - `DELETE /api/listings/:id` – ingatlan törlése (admin)
 - `POST /api/messages` – kapcsolatfelvételi üzenet mentése
+- `GET /api/messages` – összes üzenet listázása (admin)
+- `DELETE /api/messages/:id` – üzenet törlése (admin)
 - `GET /api/appointments/availability?date=YYYY-MM-DD` – foglalt/szabad időpontok egy napra
 - `POST /api/appointments` – időpontfoglalás létrehozása
 - `GET /api/appointments` – összes foglalás listázása (admin)
