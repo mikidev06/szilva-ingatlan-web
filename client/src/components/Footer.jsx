@@ -33,6 +33,16 @@ export default function Footer() {
                   <path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81ZM9.6 15.6V8.4l6.32 3.6-6.32 3.6Z" />
                 </svg>
               </a>
+              <a
+                href="https://partner.ingatlan.com/szilagyi.szilvia3"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="ingatlan.com profil"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2 2 10.5V22h6v-7h8v7h6V10.5L12 2Z" />
+                </svg>
+              </a>
             </div>
           </div>
 
@@ -90,15 +100,6 @@ export default function Footer() {
               <li>
                 <a href="mailto:szilagyi.szilva@otpip.hu">
                   szilagyi.szilva@otpip.hu
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://partner.ingatlan.com/szilagyi.szilvia3"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  ingatlan.com profil
                 </a>
               </li>
             </ul>
