@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import { fetchListings } from "../api";
 import szilviaPhoto from "../assets/szilva-1.jpg";
@@ -27,10 +27,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
-  const navigate = useNavigate();
-
-  const [location, setLocation] = useState("");
-  const [category, setCategory] = useState("");
 
   useEffect(() => {
     fetchListings("ingatlan")
@@ -43,14 +39,6 @@ export default function Home() {
       .catch(() => setFeaturedProjects([]))
       .finally(() => setLoadingProjects(false));
   }, []);
-
-  function handleSearch(e) {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (location) params.set("city", location);
-    if (category) params.set("category", category);
-    navigate(`/ingatlanok${params.toString() ? `?${params.toString()}` : ""}`);
-  }
 
   return (
     <>
@@ -104,39 +92,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <div className="container">
-        <form className="search-bar" onSubmit={handleSearch}>
-          <div className="field">
-            <label htmlFor="q-location">Helyszín</label>
-            <input
-              id="q-location"
-              type="text"
-              placeholder="Pl. Budapest"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="q-category">Kategória</label>
-            <select
-              id="q-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">Összes</option>
-              <option value="Lakás">Lakás</option>
-              <option value="Ház">Ház</option>
-              <option value="Telek">Telek</option>
-              <option value="Iroda">Iroda</option>
-              <option value="Nyaraló">Nyaraló</option>
-            </select>
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Keresés
-          </button>
-        </form>
-      </div>
 
       {(loading || featured.length > 0) && (
         <section className="section">
