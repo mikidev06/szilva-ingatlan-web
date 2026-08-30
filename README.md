@@ -53,6 +53,18 @@ Egy ingatlanhoz több fénykép is feltölthető közvetlenül a gépről. A ké
 
 Feltöltés előtt a böngésző minden képet automatikusan átméretez (max. 1920 px a hosszabb oldalon, az arányok megtartásával) és JPEG-ként újratömörít ([client/src/imageCompression.js](client/src/imageCompression.js)). Ez egységesen kicsi, gyorsan betöltődő fényképeket eredményez a telefonról készült, gyakran több MB-os eredeti fotókból is, torzítás vagy vágás nélkül.
 
+## Push értesítések (ntfy.sh)
+
+Amikor valaki elküld egy kapcsolatfelvételi üzenetet vagy lefoglal egy időpontot, a szerver egy push értesítést küld az [ntfy.sh](https://ntfy.sh)-nak ([config/ntfy.js](config/ntfy.js)), hogy Szilvia azonnal értesüljön a telefonján – admin bejelentkezés vagy e-mail nélkül.
+
+Beállítás:
+
+1. Válassz egy egyedi, nehezen kitalálható témanevet (a `.env`-ben már van egy generált érték: `NTFY_TOPIC`). Az ntfy.sh témák alapból nyilvánosak – bárki, aki ismeri a nevet, fel tud rá iratkozni –, ezért fontos, hogy ne legyen könnyen kitalálható.
+2. Töltsd le az [ntfy alkalmazást](https://ntfy.sh/#apps) (iOS/Android), vagy nyisd meg böngészőben a `https://ntfy.sh/<a te temaneved>` címet.
+3. Iratkozz fel ugyanarra a témanévre, ami a `.env`/Vercel `NTFY_TOPIC` értékében szerepel.
+
+Ha a `NTFY_TOPIC` nincs beállítva, az értesítés egyszerűen kimarad – az üzenet/foglalás mentése ettől függetlenül működik.
+
 ## Cache
 
 A `GET /api/listings` és `GET /api/listings/:id` végpontok egy egyszerű, folyamaton belüli (in-memory) TTL cache-ben tárolják a válaszokat (60, illetve 300 másodpercig), létrehozáskor/módosításkor/törléskor pedig a szerver automatikusan érvényteleníti az érintett bejegyzéseket. Lásd [config/cache.js](config/cache.js).
@@ -70,7 +82,7 @@ A projekt Vercelre van konfigurálva ([vercel.json](vercel.json)): a React klien
    vercel blob create-store szilvia-ingatlan-images --access public
    ```
 
-3. Állítsd be a projekt környezeti változóit a Vercel dashboardon (Settings → Environment Variables), vagy a CLI-vel: `MONGODB_URI`, `ADMIN_PASSWORD`, `JWT_SECRET` (a `BLOB_READ_WRITE_TOKEN`-t az előző lépés automatikusan beállítja). `NODE_ENV` és `VERCEL` Vercelen automatikusan be van állítva, ezeket nem kell megadni.
+3. Állítsd be a projekt környezeti változóit a Vercel dashboardon (Settings → Environment Variables), vagy a CLI-vel: `MONGODB_URI`, `ADMIN_PASSWORD`, `JWT_SECRET`, `NTFY_TOPIC` (a `BLOB_READ_WRITE_TOKEN`-t az előző lépés automatikusan beállítja). `NODE_ENV` és `VERCEL` Vercelen automatikusan be van állítva, ezeket nem kell megadni.
 4. Húzd le a változókat helyi fejlesztéshez, ha szükséges: `vercel env pull .env`.
 5. Minden Git push a fő branch-re automatikusan újra deployol.
 

@@ -43,7 +43,7 @@ export default function Footer() {
                 <span>Ingatlan értékesítés</span>
               </li>
               <li>
-                <span>Ingatlan értékbecslés</span>
+                <span>Projektépítkezés</span>
               </li>
               <li>
                 <span>Hitelügyintézés</span>

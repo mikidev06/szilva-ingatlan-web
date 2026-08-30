@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import Appointment from "../models/Appointment.js";
 import requireAuth from "../middleware/auth.js";
 import { BUSINESS_HOUR_SLOTS, isValidSlot } from "../config/businessHours.js";
+import { sendNtfyNotification } from "../config/ntfy.js";
 
 const router = Router();
 
@@ -56,6 +57,13 @@ router.post("/", bookingLimiter, async (req, res) => {
       date,
       time,
       notes,
+    });
+
+    await sendNtfyNotification({
+      title: "Új időpontfoglalás",
+      message: `${serviceType} – ${date} ${time}\n${name}${phone ? ` (${phone})` : ""} – ${email}${notes ? `\n\n${notes}` : ""}`,
+      tags: ["spiral_calendar_pad"],
+      priority: 4,
     });
 
     res.status(201).json(appointment);

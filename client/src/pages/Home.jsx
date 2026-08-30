@@ -11,9 +11,9 @@ const services = [
     text: "Teljes körű ügyintézés a hirdetéstől az adásvételi szerződésig, hogy Ön a lehető legjobb áron, gyorsan adhassa el ingatlanát.",
   },
   {
-    icon: "📊",
-    title: "Ingatlan értékbecslés",
-    text: "Piaci alapú, pontos értékbecslés néhány napon belül, hogy reális áron hirdethesse meg ingatlanát.",
+    icon: "🏗️",
+    title: "Projektépítkezés",
+    text: "Új építésű lakóparkok és fejlesztési projektek értékesítésében is segítek, az első egyeztetéstől a kulcsátadásig.",
   },
   {
     icon: "🏦",
