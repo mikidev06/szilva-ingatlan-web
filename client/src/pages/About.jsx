@@ -2,7 +2,7 @@ import szilviaPhoto from "../assets/szilva-2.jpg";
 
 const badges = [
   "Ingatlanközvetítői szakvizsga",
-  "10+ év tapasztalat",
+  "11+ év tapasztalat",
   "Helyi piacismeret",
   "Angolul beszélek",
 ];
@@ -53,7 +53,7 @@ export default function About() {
                 lenne szó.”
               </p>
               <p>
-                Közel 10 éves tapasztalattal rendelkezem lakóingatlanok,
+                11 éves tapasztalattal rendelkezem lakóingatlanok,
                 kereskedelmi ingatlanok és telkek közvetítésében,
                 elsősorban Budapesten és környékén.
               </p>
