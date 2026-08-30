@@ -276,6 +276,13 @@ button {
   color: var(--color-primary-dark);
 }
 
+/* A "Szoveg szine" szabaly (.nav-links a) specificitasa magasabb, mint a
+   .nav-phone-btn-e, ezert a telefongomb sotet szoveget kapna a mobil
+   menuben - ez a szabaly ezt felulirja, hogy vilagos maradjon ott is. */
+.nav-links a.nav-phone-btn {
+  color: #fffdf8;
+}
+
 .nav-links-phone {
   display: none;
 }
