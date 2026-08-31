@@ -158,7 +158,7 @@ export default function Home() {
             </div>
             <div>
               <strong>200+</strong>
-              <span>Sikeres hitelesítés</span>
+              <span>Sikeres hitelügyintézés</span>
             </div>
             <div>
               <strong>11</strong>

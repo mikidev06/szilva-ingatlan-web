@@ -98,8 +98,8 @@ export default function Footer() {
                 <a href="tel:+36305059660">+36 30 505 9660</a>
               </li>
               <li>
-                <a href="mailto:szilagyi.szilva@otpip.hu">
-                  szilagyi.szilva@otpip.hu
+                <a href="mailto:szilagyi.szilvia@otpip.hu">
+                  szilagyi.szilvia@otpip.hu
                 </a>
               </li>
             </ul>

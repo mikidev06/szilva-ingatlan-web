@@ -98,7 +98,7 @@ export default function ProjectDetail() {
                 <div className="contact-info-icon">✉</div>
                 <div>
                   <strong>E-mail</strong>
-                  <span>szilagyi.szilva@otpip.hu</span>
+                  <span>szilagyi.szilvia@otpip.hu</span>
                 </div>
               </div>
             </div>

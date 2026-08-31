@@ -15,7 +15,7 @@ export default function Privacy() {
           <p>
             Az adatkezelő: Szilágyi Szilvia (Szilva Ingatlan Kft.), 1013
             Budapest, Krisztina körút 32. E-mail:{" "}
-            <a href="mailto:szilagyi.szilva@otpip.hu">szilagyi.szilva@otpip.hu</a>,
+            <a href="mailto:szilagyi.szilvia@otpip.hu">szilagyi.szilvia@otpip.hu</a>,
             telefon: <a href="tel:+36305059660">+36 30 505 9660</a>.
           </p>
 
