@@ -13,14 +13,47 @@ const ITEM_CACHE_TTL = 300;
 const listCacheKey = (kind) => `listings:all:${kind || "any"}`;
 const itemCacheKey = (id) => `listings:${id}`;
 
+// A szelso ertekeket (min/max) az egyes lakasok adataibol szamitjuk, a
+// nullat/uresen hagyott ertekeket figyelmen kivul hagyva (meg nincsenek
+// kitoltve).
+function computeRange(values) {
+  const valid = values.filter((v) => v > 0);
+  if (valid.length === 0) return null;
+  return { min: Math.min(...valid), max: Math.max(...valid) };
+}
+
+function buildUnits(rawUnits) {
+  if (!Array.isArray(rawUnits)) return [];
+  return rawUnits.map((u) => ({
+    price: Number(u?.price) || 0,
+    size: Number(u?.size) || 0,
+    images: Array.isArray(u?.images) ? u.images.slice(0, 2) : [],
+  }));
+}
+
+// Az adott listing (es projekt eseten az osszes lakasa) fenykepeinek
+// egyetlen, lapos listaja - Blob-torleshez hasznaljuk.
+function collectAllImages(listing) {
+  const unitImages = (listing.units || []).flatMap((u) => u.images || []);
+  return [...(listing.images || []), ...unitImages];
+}
+
 function buildListingData(body) {
   const kind = body.kind === "projekt" ? "projekt" : "ingatlan";
-  const priceMin = Number(body.priceMin) || 0;
-  const priceMax = Number(body.priceMax) || 0;
-  const sizeMin = Number(body.sizeMin) || 0;
-  const sizeMax = Number(body.sizeMax) || 0;
   const roomsMin = Number(body.roomsMin) || 0;
   const roomsMax = Number(body.roomsMax) || 0;
+  const units = kind === "projekt" ? buildUnits(body.units) : [];
+
+  // Ha vannak lakasok, a projekt ar-/alapterulet-savja mindig ezekbol
+  // szamitodik. Ha meg nincs egy lakas sem kitoltve (pl. regi, a lakas-
+  // bontas elotti projekt szerkesztese), a bekuldott priceMin/Max/sizeMin/
+  // Max ertekekre esunk vissza, hogy a meglevo adat ne vesszen el.
+  const priceRange = computeRange(units.map((u) => u.price));
+  const sizeRange = computeRange(units.map((u) => u.size));
+  const priceMin = priceRange ? priceRange.min : Number(body.priceMin) || 0;
+  const priceMax = priceRange ? priceRange.max : Number(body.priceMax) || 0;
+  const sizeMin = sizeRange ? sizeRange.min : Number(body.sizeMin) || 0;
+  const sizeMax = sizeRange ? sizeRange.max : Number(body.sizeMax) || 0;
 
   return {
     title: body.title,
@@ -37,7 +70,8 @@ function buildListingData(body) {
     rooms: kind === "projekt" ? roomsMin : Number(body.rooms) || 0,
     roomsMin: kind === "projekt" ? roomsMin : 0,
     roomsMax: kind === "projekt" ? roomsMax : 0,
-    availableUnits: kind === "projekt" ? Number(body.availableUnits) || 0 : 0,
+    availableUnits: kind === "projekt" ? units.length : 0,
+    units,
     description: body.description || "",
     featured: Boolean(body.featured),
     images: Array.isArray(body.images) ? body.images : [],
@@ -153,7 +187,9 @@ router.put("/:id", requireAuth, async (req, res) => {
     }
 
     const data = buildListingData(req.body);
-    const removedImages = existing.images.filter((img) => !data.images.includes(img));
+    const oldImages = collectAllImages(existing);
+    const newImages = collectAllImages(data);
+    const removedImages = oldImages.filter((img) => !newImages.includes(img));
 
     const listing = await Listing.findByIdAndUpdate(req.params.id, data, {
       new: true,
@@ -175,7 +211,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
     if (!listing) {
       return res.status(404).json({ message: "Nem talalhato ingatlan." });
     }
-    await deleteImages(listing.images);
+    await deleteImages(collectAllImages(listing));
     cacheDel(listCacheKey(null), listCacheKey("ingatlan"), listCacheKey("projekt"), itemCacheKey(req.params.id));
     res.json({ message: "Ingatlan torolve." });
   } catch (err) {

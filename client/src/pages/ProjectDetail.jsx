@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchListing, formatPriceRange, formatSizeRange } from "../api";
+import { fetchListing, formatPrice, formatPriceRange, formatSizeRange } from "../api";
 import Gallery from "../components/Gallery";
 
 export default function ProjectDetail() {
@@ -67,6 +67,33 @@ export default function ProjectDetail() {
                 <span>Szabad lakások</span>
               </div>
             </div>
+
+            {project.units?.length > 0 && (
+              <>
+                <h2>Elérhető lakások</h2>
+                <div className="unit-grid">
+                  {project.units.map((unit, index) => (
+                    <div className="unit-card" key={index}>
+                      <div className="unit-card-media">
+                        {unit.images?.[0] ? (
+                          <img src={unit.images[0]} alt={`${index + 1}. lakás`} loading="lazy" />
+                        ) : (
+                          <div className="unit-card-media-empty">📷</div>
+                        )}
+                      </div>
+                      <div className="unit-card-body">
+                        <div className="unit-card-price">
+                          {unit.price ? formatPrice(unit.price) : "Ár egyeztetés alatt"}
+                        </div>
+                        <div className="unit-card-size">
+                          {unit.size ? `${unit.size} m²` : "Alapterület egyeztetés alatt"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
             <h2>Leírás</h2>
             <p>{project.description || "Ehhez a projekthez még nincs részletes leírás megadva."}</p>

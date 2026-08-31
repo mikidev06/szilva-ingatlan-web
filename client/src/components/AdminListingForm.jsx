@@ -6,13 +6,9 @@ const emptyForm = {
   title: "",
   category: "Lakás",
   price: "",
-  priceMin: "",
-  priceMax: "",
   city: "",
   address: "",
   size: "",
-  sizeMin: "",
-  sizeMax: "",
   rooms: "",
   roomsMin: "",
   roomsMax: "",
@@ -20,6 +16,31 @@ const emptyForm = {
   description: "",
   featured: false,
 };
+
+const MAX_UNITS = 300;
+const MAX_UNIT_IMAGES = 2;
+
+function emptyUnit() {
+  return { price: "", size: "", existingImages: [], uploads: [] };
+}
+
+// Ha a projektnek mar vannak reszletezett lakasai, azokbol inditunk.
+// Regi, lakas-bontas elotti projekt szerkesztesekor a mar megadott
+// "szabad lakasok" szamahoz ures sorokat keszitunk, hogy at lehessen
+// migralni a reszletes adatokra.
+function buildInitialUnits(initial) {
+  if (!initial) return [];
+  if (Array.isArray(initial.units) && initial.units.length > 0) {
+    return initial.units.map((u) => ({
+      price: u.price ?? "",
+      size: u.size ?? "",
+      existingImages: Array.isArray(u.images) ? u.images : [],
+      uploads: [],
+    }));
+  }
+  const count = Number(initial.availableUnits) || 0;
+  return Array.from({ length: count }, emptyUnit);
+}
 
 let uploadIdCounter = 0;
 
@@ -30,13 +51,9 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           title: initial.title || "",
           category: initial.category || "Lakás",
           price: initial.price ?? "",
-          priceMin: initial.priceMin ?? "",
-          priceMax: initial.priceMax ?? "",
           city: initial.city || "",
           address: initial.address || "",
           size: initial.size ?? "",
-          sizeMin: initial.sizeMin ?? "",
-          sizeMax: initial.sizeMax ?? "",
           rooms: initial.rooms ?? "",
           roomsMin: initial.roomsMin ?? "",
           roomsMax: initial.roomsMax ?? "",
@@ -47,6 +64,9 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
       : emptyForm
   );
 
+  const [units, setUnits] = useState(() => buildInitialUnits(initial));
+  const unitFileInputRefs = useRef({});
+
   const [existingImages, setExistingImages] = useState(initial?.images || []);
   const [uploads, setUploads] = useState([]); // { id, previewUrl, status, url?, error? }
   const fileInputRef = useRef(null);
@@ -54,6 +74,7 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
   useEffect(() => {
     return () => {
       uploads.forEach((u) => URL.revokeObjectURL(u.previewUrl));
+      units.forEach((u) => u.uploads.forEach((up) => URL.revokeObjectURL(up.previewUrl)));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -64,6 +85,101 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  }
+
+  // A "Szabad lakások" mezo erteke hatarozza meg, hany lakas-sor jelenjen
+  // meg alatta: novelesnel ures sorok kerulnek a vegere, csokkentesnel a
+  // vegerol tunnek el (a mar feltoltott, de levagott sorok kepeinek
+  // preview URL-jet felszabaditjuk).
+  function handleAvailableUnitsChange(e) {
+    const value = e.target.value;
+    setForm((prev) => ({ ...prev, availableUnits: value }));
+
+    const count = Math.max(0, Math.min(MAX_UNITS, Number(value) || 0));
+    setUnits((prev) => {
+      if (count >= prev.length) {
+        return [...prev, ...Array.from({ length: count - prev.length }, emptyUnit)];
+      }
+      const removed = prev.slice(count);
+      removed.forEach((u) => u.uploads.forEach((up) => URL.revokeObjectURL(up.previewUrl)));
+      return prev.slice(0, count);
+    });
+  }
+
+  function handleUnitFieldChange(index, field, value) {
+    setUnits((prev) => prev.map((u, i) => (i === index ? { ...u, [field]: value } : u)));
+  }
+
+  async function handleUnitFilesSelected(index, e) {
+    const unit = units[index];
+    const remainingSlots = MAX_UNIT_IMAGES - unit.existingImages.length - unit.uploads.length;
+    const files = Array.from(e.target.files || []).slice(0, Math.max(0, remainingSlots));
+    e.target.value = "";
+
+    for (const file of files) {
+      const id = ++uploadIdCounter;
+      const previewUrl = URL.createObjectURL(file);
+      setUnits((prev) =>
+        prev.map((u, i) =>
+          i === index ? { ...u, uploads: [...u.uploads, { id, previewUrl, status: "compressing" }] } : u
+        )
+      );
+
+      compressImage(file)
+        .then((compressed) => {
+          setUnits((prev) =>
+            prev.map((u, i) =>
+              i === index
+                ? { ...u, uploads: u.uploads.map((x) => (x.id === id ? { ...x, status: "uploading" } : x)) }
+                : u
+            )
+          );
+
+          return upload(compressed.name, compressed, {
+            access: "public",
+            handleUploadUrl: "/api/listings/blob-upload",
+            clientPayload: JSON.stringify({ token }),
+          });
+        })
+        .then((blob) => {
+          setUnits((prev) =>
+            prev.map((u, i) =>
+              i === index
+                ? { ...u, uploads: u.uploads.map((x) => (x.id === id ? { ...x, status: "done", url: blob.url } : x)) }
+                : u
+            )
+          );
+        })
+        .catch((err) => {
+          setUnits((prev) =>
+            prev.map((u, i) =>
+              i === index
+                ? {
+                    ...u,
+                    uploads: u.uploads.map((x) => (x.id === id ? { ...x, status: "error", error: err.message } : x)),
+                  }
+                : u
+            )
+          );
+        });
+    }
+  }
+
+  function removeUnitExistingImage(index, url) {
+    setUnits((prev) =>
+      prev.map((u, i) => (i === index ? { ...u, existingImages: u.existingImages.filter((img) => img !== url) } : u))
+    );
+  }
+
+  function removeUnitUpload(index, uploadId) {
+    setUnits((prev) =>
+      prev.map((u, i) => {
+        if (i !== index) return u;
+        const target = u.uploads.find((x) => x.id === uploadId);
+        if (target) URL.revokeObjectURL(target.previewUrl);
+        return { ...u, uploads: u.uploads.filter((x) => x.id !== uploadId) };
+      })
+    );
   }
 
   async function handleFilesSelected(e) {
@@ -114,26 +230,31 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
     });
   }
 
-  const isUploading = uploads.some((u) => u.status === "uploading" || u.status === "compressing");
+  const isUploading =
+    uploads.some((u) => u.status === "uploading" || u.status === "compressing") ||
+    units.some((u) => u.uploads.some((x) => x.status === "uploading" || x.status === "compressing"));
 
   function handleSubmit(e) {
     e.preventDefault();
 
     const newImageUrls = uploads.filter((u) => u.status === "done").map((u) => u.url);
 
+    const unitsPayload = units.map((u) => ({
+      price: Number(u.price) || 0,
+      size: Number(u.size) || 0,
+      images: [...u.existingImages, ...u.uploads.filter((x) => x.status === "done").map((x) => x.url)],
+    }));
+
     onSubmit({
       ...form,
       kind,
       price: Number(form.price) || 0,
-      priceMin: Number(form.priceMin) || 0,
-      priceMax: Number(form.priceMax) || 0,
       size: Number(form.size) || 0,
-      sizeMin: Number(form.sizeMin) || 0,
-      sizeMax: Number(form.sizeMax) || 0,
       rooms: Number(form.rooms) || 0,
       roomsMin: Number(form.roomsMin) || 0,
       roomsMax: Number(form.roomsMax) || 0,
       availableUnits: Number(form.availableUnits) || 0,
+      units: kind === "projekt" ? unitsPayload : [],
       images: [...existingImages, ...newImageUrls],
     });
   }
@@ -165,37 +286,7 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           </select>
         </div>
 
-        {kind === "projekt" ? (
-          <>
-            <div className="field">
-              <label htmlFor="af-price-min">Ártól (Ft) *</label>
-              <input
-                id="af-price-min"
-                name="priceMin"
-                type="number"
-                min="0"
-                required
-                value={form.priceMin}
-                onChange={handleChange}
-                placeholder="Pl. 45000000"
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="af-price-max">Árig (Ft) *</label>
-              <input
-                id="af-price-max"
-                name="priceMax"
-                type="number"
-                min="0"
-                required
-                value={form.priceMax}
-                onChange={handleChange}
-                placeholder="Pl. 62000000"
-              />
-            </div>
-          </>
-        ) : (
+        {kind !== "projekt" && (
           <div className="field">
             <label htmlFor="af-price">Ár (Ft) *</label>
             <input
@@ -236,35 +327,7 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
           />
         </div>
 
-        {kind === "projekt" ? (
-          <>
-            <div className="field">
-              <label htmlFor="af-size-min">Alapterülettől (m²)</label>
-              <input
-                id="af-size-min"
-                name="sizeMin"
-                type="number"
-                min="0"
-                value={form.sizeMin}
-                onChange={handleChange}
-                placeholder="Pl. 45"
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="af-size-max">Alapterületig (m²)</label>
-              <input
-                id="af-size-max"
-                name="sizeMax"
-                type="number"
-                min="0"
-                value={form.sizeMax}
-                onChange={handleChange}
-                placeholder="Pl. 85"
-              />
-            </div>
-          </>
-        ) : (
+        {kind !== "projekt" && (
           <div className="field">
             <label htmlFor="af-size">Alapterület (m²)</label>
             <input
@@ -329,9 +392,114 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
               type="number"
               min="0"
               value={form.availableUnits}
-              onChange={handleChange}
+              onChange={handleAvailableUnitsChange}
               placeholder="Pl. 12"
             />
+          </div>
+        )}
+
+        {kind === "projekt" && units.length > 0 && (
+          <div className="field admin-form-span">
+            <label>Lakások adatai ({units.length})</label>
+            <p className="admin-form-hint">
+              Az ár és alapterület tartomány a lakások adataiból számolódik automatikusan.
+            </p>
+            <div className="admin-units-list">
+              {units.map((unit, index) => {
+                const totalImages = unit.existingImages.length + unit.uploads.length;
+                return (
+                  <div className="admin-unit-card" key={index}>
+                    <div className="admin-unit-header">{index + 1}. lakás</div>
+
+                    <div className="admin-unit-fields">
+                      <div className="field">
+                        <label htmlFor={`af-unit-price-${index}`}>Ár (Ft)</label>
+                        <input
+                          id={`af-unit-price-${index}`}
+                          type="number"
+                          min="0"
+                          value={unit.price}
+                          onChange={(e) => handleUnitFieldChange(index, "price", e.target.value)}
+                          placeholder="Pl. 52000000"
+                        />
+                      </div>
+                      <div className="field">
+                        <label htmlFor={`af-unit-size-${index}`}>Alapterület (m²)</label>
+                        <input
+                          id={`af-unit-size-${index}`}
+                          type="number"
+                          min="0"
+                          value={unit.size}
+                          onChange={(e) => handleUnitFieldChange(index, "size", e.target.value)}
+                          placeholder="Pl. 62"
+                        />
+                      </div>
+                    </div>
+
+                    {(unit.existingImages.length > 0 || unit.uploads.length > 0) && (
+                      <div className="admin-image-grid admin-unit-image-grid">
+                        {unit.existingImages.map((url) => (
+                          <div className="admin-image-thumb" key={url}>
+                            <img src={url} alt="" />
+                            <button
+                              type="button"
+                              className="admin-image-remove"
+                              onClick={() => removeUnitExistingImage(index, url)}
+                              aria-label="Kép eltávolítása"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                        {unit.uploads.map((u) => (
+                          <div className="admin-image-thumb" key={u.id}>
+                            <img src={u.previewUrl} alt="" />
+                            {u.status === "compressing" && (
+                              <div className="admin-image-status">Tömörítés…</div>
+                            )}
+                            {u.status === "uploading" && (
+                              <div className="admin-image-status">Feltöltés…</div>
+                            )}
+                            {u.status === "error" && (
+                              <div className="admin-image-status admin-image-status-error">
+                                Hiba: {u.error}
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              className="admin-image-remove"
+                              onClick={() => removeUnitUpload(index, u.id)}
+                              aria-label="Kép eltávolítása"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      hidden
+                      ref={(el) => {
+                        unitFileInputRefs.current[index] = el;
+                      }}
+                      onChange={(e) => handleUnitFilesSelected(index, e)}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-small"
+                      disabled={totalImages >= MAX_UNIT_IMAGES}
+                      onClick={() => unitFileInputRefs.current[index]?.click()}
+                    >
+                      + Fénykép ({totalImages}/{MAX_UNIT_IMAGES})
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

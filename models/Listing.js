@@ -35,6 +35,20 @@ const listingSchema = new mongoose.Schema(
     roomsMax: { type: Number, default: 0, min: 0 },
     // Csak "projekt" eseten hasznalt: hany lakas erheto meg jelenleg.
     availableUnits: { type: Number, default: 0, min: 0 },
+    // Csak "projekt" eseten hasznalt: az egyes szabad lakasok reszletei
+    // (ar, alapterulet, sajat fenykepek). Ha van legalabb egy elem, ebbol
+    // szamitjuk ki a priceMin/priceMax es sizeMin/sizeMax ertekeket - lasd
+    // routes/listings.js buildListingData().
+    units: {
+      type: [
+        {
+          price: { type: Number, default: 0, min: 0 },
+          size: { type: Number, default: 0, min: 0 },
+          images: { type: [String], default: [] },
+        },
+      ],
+      default: [],
+    },
     description: { type: String, default: "" },
     images: { type: [String], default: [] },
     featured: { type: Boolean, default: false },
