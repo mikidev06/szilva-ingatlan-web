@@ -870,9 +870,14 @@ button {
   font-size: 0.95rem;
 }
 
-.contact-info-item span {
+.contact-info-item span,
+.contact-info-item a {
   color: var(--color-text-muted);
   font-size: 0.9rem;
+}
+
+.contact-info-item a:hover {
+  color: var(--color-primary-dark);
 }
 
 .map-embed {
