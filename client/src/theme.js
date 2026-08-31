@@ -61,6 +61,17 @@ export function setThemeWithTransition(theme, origin, onApplied) {
     Math.max(y, window.innerHeight - y)
   );
 
+  // A kor kozeppontjat es vegso sugarat CSS valtozokent adjuk at (nem
+  // document.documentElement.animate()-tel, kesobb) - a
+  // ::view-transition-new(root) csomopont a "theme-reveal" CSS
+  // kulcskocka-animaciot mar a legelso kirajzolt framen a "0px" allapotbol
+  // inditja, igy nincs egy pillanatnyi res, amiben a leplezetlen uj tema
+  // felvillanna, majd a kor animacio inditasakor visszaugrana a regire.
+  const root = document.documentElement;
+  root.style.setProperty("--theme-reveal-x", `${x}px`);
+  root.style.setProperty("--theme-reveal-y", `${y}px`);
+  root.style.setProperty("--theme-reveal-r", `${endRadius}px`);
+
   // onApplied-et (pl. a gomb ikonjat valto React allapotot) is a
   // callbacken belul, flushSync-kel kell meghivni, kulonben a React
   // renderelese a "regi"/"uj" pillanatkep felvetele KOZOTT, kulon
@@ -70,21 +81,9 @@ export function setThemeWithTransition(theme, origin, onApplied) {
     onApplied?.();
   });
 
-  transition.ready
-    .then(() => {
-      document.documentElement.animate(
-        {
-          clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
-        },
-        {
-          duration: 600,
-          easing: "ease-in-out",
-          pseudoElement: "::view-transition-new(root)",
-        }
-      );
-    })
-    .catch(() => {
-      // A bongeszo megszakithatja az atmenetet (pl. gyors egymas utani
-      // kattintasnal) - ekkor a tema mar amugy is beallt, nincs teendo.
-    });
+  transition.finished.finally(() => {
+    root.style.removeProperty("--theme-reveal-x");
+    root.style.removeProperty("--theme-reveal-y");
+    root.style.removeProperty("--theme-reveal-r");
+  });
 }
