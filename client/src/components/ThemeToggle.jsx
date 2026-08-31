@@ -1,18 +1,22 @@
-import { useState } from "react";
-import { getEffectiveTheme, setTheme } from "../theme";
+import { useRef, useState } from "react";
+import { getEffectiveTheme, setThemeWithTransition } from "../theme";
 
 export default function ThemeToggle() {
   const [theme, setThemeState] = useState(getEffectiveTheme);
   const isDark = theme === "dark";
+  const buttonRef = useRef(null);
 
   function toggle() {
     const next = isDark ? "light" : "dark";
-    setTheme(next);
+    const rect = buttonRef.current?.getBoundingClientRect();
+    const origin = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null;
+    setThemeWithTransition(next, origin);
     setThemeState(next);
   }
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       className={`theme-toggle ${isDark ? "is-dark" : ""}`}
       onClick={toggle}

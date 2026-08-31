@@ -70,8 +70,21 @@
 * {
   box-sizing: border-box;
   /* Sima szinatmenet temavaltaskor (vilagos/sotet mod), hogy az oldal
-     ne "ugorjon", hanem lagyan valtson szint. */
+     ne "ugorjon", hanem lagyan valtson szint. Ez a tartalek olyan
+     bongeszokben, amik nem tamogatjak a lent bekapcsolt kor alaku
+     "reveal" animaciot (lasd theme.js setThemeWithTransition). */
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Temavalto kor-reveal animacio: a bongeszo alapertelmezett
+   keresztuszasat kikapcsoljuk, hogy csak a JS-ben inditott, a valto
+   gombtol induló clip-path kor animacio latszodjon (lasd theme.js). */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
 }
 
 html,
