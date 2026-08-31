@@ -134,7 +134,9 @@ export default function Contact() {
                 <div className="contact-info-icon">✉</div>
                 <div>
                   <strong>E-mail</strong>
-                  <span>szilagyi.szilvia@otpip.hu</span>
+                  <a href="mailto:szilagyi.szilvia@otpip.hu">
+                  szilagyi.szilvia@otpip.hu
+                  </a>
                 </div>
               </div>
               <div className="contact-info-item">

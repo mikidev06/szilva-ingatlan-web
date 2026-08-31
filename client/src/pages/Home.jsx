@@ -27,17 +27,49 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  // Az onallo ingatlanok es a projekteken beluli, egyedi lakasok egyutt
+  // szamitott, elo darabszama a hero statisztikahoz (nem a projektek
+  // darabszama, hanem a bennuk levo lakasoke). Null, amig meg nem all
+  // rendelkezesre mindket lekeres eredmenye.
+  const [totalCount, setTotalCount] = useState(null);
 
   useEffect(() => {
+    let listingsCount = null;
+    let projectUnitsCount = null;
+
+    function maybeSetTotal() {
+      if (listingsCount !== null && projectUnitsCount !== null) {
+        setTotalCount(listingsCount + projectUnitsCount);
+      }
+    }
+
     fetchListings("ingatlan")
-      .then((data) => setFeatured(data.filter((l) => l.featured).slice(0, 3)))
-      .catch(() => setFeatured([]))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        setFeatured(data.filter((l) => l.featured).slice(0, 3));
+        listingsCount = data.length;
+      })
+      .catch(() => {
+        setFeatured([]);
+        listingsCount = 0;
+      })
+      .finally(() => {
+        setLoading(false);
+        maybeSetTotal();
+      });
 
     fetchListings("projekt")
-      .then((data) => setFeaturedProjects(data.filter((p) => p.featured).slice(0, 3)))
-      .catch(() => setFeaturedProjects([]))
-      .finally(() => setLoadingProjects(false));
+      .then((data) => {
+        setFeaturedProjects(data.filter((p) => p.featured).slice(0, 3));
+        projectUnitsCount = data.reduce((sum, p) => sum + (Number(p.availableUnits) || 0), 0);
+      })
+      .catch(() => {
+        setFeaturedProjects([]);
+        projectUnitsCount = 0;
+      })
+      .finally(() => {
+        setLoadingProjects(false);
+        maybeSetTotal();
+      });
   }, []);
 
   return (
@@ -74,8 +106,8 @@ export default function Home() {
                 <span>Szakmai tapasztalat</span>
               </div>
               <div className="hero-stat">
-                <strong>Magyar, Angol, Olasz</strong>
-                <span>Nyelvtudás</span>
+                <strong>{totalCount === null ? "–" : totalCount}</strong>
+                <span>Elérhető ingatlan</span>
               </div>
             </div>
           </div>
