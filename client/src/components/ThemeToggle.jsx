@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { getEffectiveTheme, setThemeWithTransition } from "../theme";
 
 export default function ThemeToggle() {
@@ -10,8 +11,10 @@ export default function ThemeToggle() {
     const next = isDark ? "light" : "dark";
     const rect = buttonRef.current?.getBoundingClientRect();
     const origin = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null;
-    setThemeWithTransition(next, origin);
-    setThemeState(next);
+    // A gomb ikonjanak allapotat is a temavaltas atmenetenek "pillanatkep"
+    // hatarain BELUL kell frissiteni (flushSync-kel szinkronban), kulonben
+    // az ikon kicsit korabban villanna at, mint ahogy a kor-reveal elindul.
+    setThemeWithTransition(next, origin, () => flushSync(() => setThemeState(next)));
   }
 
   return (

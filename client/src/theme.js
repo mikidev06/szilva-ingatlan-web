@@ -42,7 +42,7 @@ export function bootstrapTheme() {
 // teljes oldalt pillanatkepkent kezeli, igy a hatterszinek mellett a
 // CSS valtozokbol epulo gradienseket (pl. a hero-szekcio) is szepen,
 // ugras nelkul valtja at, amit egy sima CSS transition nem tudna.
-export function setThemeWithTransition(theme, origin) {
+export function setThemeWithTransition(theme, origin, onApplied) {
   const reducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia &&
@@ -50,6 +50,7 @@ export function setThemeWithTransition(theme, origin) {
 
   if (typeof document === "undefined" || !document.startViewTransition || reducedMotion) {
     setTheme(theme);
+    onApplied?.();
     return;
   }
 
@@ -60,8 +61,13 @@ export function setThemeWithTransition(theme, origin) {
     Math.max(y, window.innerHeight - y)
   );
 
+  // onApplied-et (pl. a gomb ikonjat valto React allapotot) is a
+  // callbacken belul, flushSync-kel kell meghivni, kulonben a React
+  // renderelese a "regi"/"uj" pillanatkep felvetele KOZOTT, kulon
+  // frame-ben villanna be - ettol tunt "akadozonak" a valtas.
   const transition = document.startViewTransition(() => {
     setTheme(theme);
+    onApplied?.();
   });
 
   transition.ready
