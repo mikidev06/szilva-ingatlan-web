@@ -1,24 +1,36 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import Listings from "./pages/Listings";
-import ListingDetail from "./pages/ListingDetail";
-import Projects from "./pages/Projects";
-import ProjectDetail from "./pages/ProjectDetail";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Booking from "./pages/Booking";
-import Privacy from "./pages/Privacy";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/NotFound";
+
+// A kezdolap a fo csomagban marad (ide erkezik a latogatok tobbsege), a tobbi
+// oldal viszont csak akkor toltodik le, amikor tenylegesen odanavigalnak.
+// Az admin feluletet (urlap + kepfeltolto + Vercel Blob kliens) igy a
+// nyilvanos latogatok soha nem toltik le.
+const Listings = lazy(() => import("./pages/Listings"));
+const ListingDetail = lazy(() => import("./pages/ListingDetail"));
+const Projects = lazy(() => import("./pages/Projects"));
+const ProjectDetail = lazy(() => import("./pages/ProjectDetail"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Booking = lazy(() => import("./pages/Booking"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Admin = lazy(() => import("./pages/Admin"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+function PageFallback() {
+  return <div className="loading-state">Betöltés…</div>;
+}
 
 function PublicLayout() {
   return (
     <>
       <Navbar />
       <main>
-        <Outlet />
+        <Suspense fallback={<PageFallback />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </>
@@ -40,7 +52,14 @@ export default function App() {
         <Route path="/adatvedelem" element={<Privacy />} />
         <Route path="*" element={<NotFound />} />
       </Route>
-      <Route path="/admin" element={<Admin />} />
+      <Route
+        path="/admin"
+        element={
+          <Suspense fallback={<PageFallback />}>
+            <Admin />
+          </Suspense>
+        }
+      />
     </Routes>
   );
 }

@@ -83,7 +83,7 @@ export default function Gallery({ images, title }) {
             onClick={goPrev}
             aria-label="Előző kép"
           >
-            <img src={images[prevIndex]} alt="" />
+            <img src={images[prevIndex]} alt="" decoding="async" />
           </button>
         )}
 
@@ -102,6 +102,7 @@ export default function Gallery({ images, title }) {
             src={images[index]}
             alt={`${title} – ${index + 1}. kép`}
             onClick={() => setMaximized(true)}
+            decoding="async"
             className={direction === 1 ? "gallery-slide-in-right" : "gallery-slide-in-left"}
           />
 
@@ -137,7 +138,7 @@ export default function Gallery({ images, title }) {
             onClick={goNext}
             aria-label="Következő kép"
           >
-            <img src={images[nextIndex]} alt="" />
+            <img src={images[nextIndex]} alt="" decoding="async" />
           </button>
         )}
       </div>

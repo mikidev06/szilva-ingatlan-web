@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import { fetchListings } from "../api";
-import szilviaPhoto from "../assets/szilva-1.jpg";
+import szilviaPhoto from "../assets/szilva-1.webp";
 
 const services = [
   {
@@ -116,6 +116,10 @@ export default function Home() {
             <img
               src={szilviaPhoto}
               alt="Szilágyi Szilvia ingatlanközvetítő"
+              width="1200"
+              height="1200"
+              fetchPriority="high"
+              decoding="async"
             />
             <div className="hero-badge">
               <strong>Szilágyi Szilvia</strong>

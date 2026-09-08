@@ -1,4 +1,4 @@
-import szilviaPhoto from "../assets/szilva-2.jpg";
+import szilviaPhoto from "../assets/szilva-2.webp";
 import MapEmbed from "../components/MapEmbed";
 
 const badges = [
@@ -39,7 +39,7 @@ export default function About() {
         <div className="container">
           <div className="agent-panel">
             <div className="agent-photo">
-              <img src={szilviaPhoto} alt="Szilágyi Szilvia" />
+              <img src={szilviaPhoto} alt="Szilágyi Szilvia" width="1000" height="1056" loading="lazy" decoding="async" />
             </div>
             <div>
               <span className="eyebrow">Rólam</span>
