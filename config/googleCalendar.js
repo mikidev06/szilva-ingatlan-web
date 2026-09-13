@@ -97,8 +97,18 @@ async function getValidAccessToken() {
 
 async function isConnected() {
   if (!isConfigured()) return false;
-  const auth = await GoogleAuth.findOne();
-  return Boolean(auth);
+
+  // A rekord letezese onmagaban nem jelenti, hogy a token meg mukodik - a
+  // Google 7 naponta lejartja a refresh tokent, ha az OAuth alkalmazas meg
+  // "Testing" allapotban van a Google Cloud Console-ban. Ilyenkor tenyleges
+  // frissitest probalunk, hogy az admin felulet ne mutasson helytelenul
+  // "osszekapcsolva" allapotot egy mar halott token mellett.
+  try {
+    const token = await getValidAccessToken();
+    return Boolean(token);
+  } catch {
+    return false;
+  }
 }
 
 async function disconnect() {
