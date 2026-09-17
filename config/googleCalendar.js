@@ -11,9 +11,9 @@ function isConfigured() {
   );
 }
 
-// A Google csak az elso hozzajaruláskor ad refresh_token-t, ezert mindig
-// prompt=consent-et hasznalunk, hogy ujracsatlakozaskor is biztosan kapjunk
-// egyet (a regi tokent egyebkent felulirnank egy ures ertekkel).
+// Google only returns a refresh_token on the first consent, so we always use
+// prompt=consent to make sure we get one on reconnect as well (otherwise we
+// would overwrite the old token with an empty value).
 function buildAuthUrl(state) {
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
@@ -98,11 +98,11 @@ async function getValidAccessToken() {
 async function isConnected() {
   if (!isConfigured()) return false;
 
-  // A rekord letezese onmagaban nem jelenti, hogy a token meg mukodik - a
-  // Google 7 naponta lejartja a refresh tokent, ha az OAuth alkalmazas meg
-  // "Testing" allapotban van a Google Cloud Console-ban. Ilyenkor tenyleges
-  // frissitest probalunk, hogy az admin felulet ne mutasson helytelenul
-  // "osszekapcsolva" allapotot egy mar halott token mellett.
+  // The mere existence of the record does not mean the token still works -
+  // Google expires the refresh token every 7 days while the OAuth app is still
+  // in "Testing" state in the Google Cloud Console. In that case we attempt an
+  // actual refresh, so that the admin UI does not incorrectly show
+  // "connected" next to an already dead token.
   try {
     const token = await getValidAccessToken();
     return Boolean(token);
@@ -115,8 +115,8 @@ async function disconnect() {
   await GoogleAuth.deleteMany({});
 }
 
-// timeMinISO/timeMaxISO: RFC3339 idobelyegek. Vissza: [{ start, end }] a
-// naptarban foglalt (busy) idointervallumok UTC-ben.
+// timeMinISO/timeMaxISO: RFC3339 timestamps. Returns: [{ start, end }] - the
+// busy intervals of the calendar, in UTC.
 async function getBusyIntervals(timeMinISO, timeMaxISO) {
   const accessToken = await getValidAccessToken();
   if (!accessToken) return [];

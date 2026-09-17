@@ -13,31 +13,31 @@ const listingSchema = new mongoose.Schema(
       enum: ["Lakás", "Ház", "Telek", "Iroda", "Nyaraló"],
       default: "Lakás",
     },
-    // "ingatlan" eseten a price az egyetlen ar; "projekt" eseten a price a
-    // priceMin-nel egyezik meg (osszefoglalo/rendezesi ertekkent), a tenyleges
-    // ar-sav megjelenitese a priceMin/priceMax parosbol tortenik.
+    // For "ingatlan" the price is the single price; for "projekt" the price
+    // equals priceMin (as a summary/sorting value), while the actual price
+    // range is rendered from the priceMin/priceMax pair.
     price: { type: Number, required: true, min: 0 },
     priceMin: { type: Number, default: 0, min: 0 },
     priceMax: { type: Number, default: 0, min: 0 },
     city: { type: String, required: true, trim: true, maxlength: 100 },
     address: { type: String, default: "", trim: true, maxlength: 200 },
-    // "ingatlan" eseten a size az egyetlen alapterulet; "projekt" eseten a
-    // size a sizeMin-nel egyezik meg (osszefoglalo ertekkent), a tenyleges
-    // alapterulet-sav megjelenitese a sizeMin/sizeMax parosbol tortenik.
+    // For "ingatlan" the size is the single floor area; for "projekt" the
+    // size equals sizeMin (as a summary value), while the actual floor-area
+    // range is rendered from the sizeMin/sizeMax pair.
     size: { type: Number, default: 0, min: 0 },
     sizeMin: { type: Number, default: 0, min: 0 },
     sizeMax: { type: Number, default: 0, min: 0 },
-    // "ingatlan" eseten a rooms az egyetlen szobaszam; "projekt" eseten a
-    // rooms a roomsMin-nel egyezik meg (osszefoglalo ertekkent), a tenyleges
-    // szobaszam-sav megjelenitese a roomsMin/roomsMax parosbol tortenik.
+    // For "ingatlan" the rooms is the single room count; for "projekt" the
+    // rooms equals roomsMin (as a summary value), while the actual room-count
+    // range is rendered from the roomsMin/roomsMax pair.
     rooms: { type: Number, default: 0, min: 0 },
     roomsMin: { type: Number, default: 0, min: 0 },
     roomsMax: { type: Number, default: 0, min: 0 },
-    // Csak "projekt" eseten hasznalt: hany lakas erheto meg jelenleg.
+    // Used only for "projekt": how many apartments are currently available.
     availableUnits: { type: Number, default: 0, min: 0 },
-    // Csak "projekt" eseten hasznalt: az egyes szabad lakasok reszletei
-    // (ar, alapterulet, sajat fenykepek). Ha van legalabb egy elem, ebbol
-    // szamitjuk ki a priceMin/priceMax es sizeMin/sizeMax ertekeket - lasd
+    // Used only for "projekt": the details of each available apartment
+    // (price, floor area, own photos). If there is at least one item, the
+    // priceMin/priceMax and sizeMin/sizeMax values are computed from it - see
     // routes/listings.js buildListingData().
     units: {
       type: [

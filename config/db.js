@@ -5,20 +5,20 @@ export default async function connectDB() {
 
   if (!uri) {
     console.warn(
-      "Figyelem: nincs beallitva MONGODB_URI a .env fajlban, a szerver adatbazis nelkul indul."
+      "Warning: MONGODB_URI is not set in the .env file, the server starts without a database."
     );
     return;
   }
 
   try {
     await mongoose.connect(uri);
-    console.log("MongoDB Atlas kapcsolat sikeres.");
+    console.log("MongoDB Atlas connection successful.");
   } catch (err) {
-    console.error("MongoDB kapcsolodasi hiba:", err.message);
-    // Vercel-en (szerverless fuggvenyben) a process.exit egy elo, meleg
-    // fuggveny-peldanyt is megolne mas kerelmek kozepen - ott a kapcsolodasi
-    // hiba egyszeruen naplozodik, es az egyes vegpontok sajat try/catch-e
-    // kezeli a hibat.
+    console.error("MongoDB connection error:", err.message);
+    // On Vercel (in a serverless function) process.exit would kill a live,
+    // warm function instance in the middle of other requests - there the
+    // connection error is simply logged, and each endpoint's own try/catch
+    // handles the failure.
     if (!process.env.VERCEL) {
       process.exit(1);
     }

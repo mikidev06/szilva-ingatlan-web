@@ -5,8 +5,9 @@ import Listing from "./models/Listing.js";
 
 dotenv.config();
 
-// Mintaadatok helyi fejlesztéshez / bemutatóhoz. NE futtasd az éles adatbázison,
-// mert törli a meglévő ingatlanokat, és lecseréli ezekre a minta hirdetésekre.
+// Sample data for local development / demos. DO NOT run it against the
+// production database, as it deletes the existing properties and replaces them
+// with these sample listings.
 const sampleListings = [
   {
     title: "Napfényes családi ház a Rózsadombon",
@@ -106,7 +107,7 @@ const sampleListings = [
 async function seed() {
   if (process.env.NODE_ENV === "production") {
     console.error(
-      "A seed szkript production kornyezetben nem futtathato, mert torli az osszes meglevo ingatlant."
+      "The seed script cannot be run in a production environment, because it deletes every existing property."
     );
     process.exit(1);
   }
@@ -114,14 +115,14 @@ async function seed() {
   await connectDB();
 
   if (mongoose.connection.readyState !== 1) {
-    console.error("Nincs adatbazis-kapcsolat, a feltoltes megszakadt.");
+    console.error("No database connection, the upload was aborted.");
     process.exit(1);
   }
 
   await Listing.deleteMany({});
   await Listing.insertMany(sampleListings);
 
-  console.log(`${sampleListings.length} minta ingatlan feltoltve.`);
+  console.log(`${sampleListings.length} sample properties inserted.`);
   await mongoose.disconnect();
   process.exit(0);
 }

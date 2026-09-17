@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 const password = process.argv[2];
 
 if (!password) {
-  console.error("Hasznalat: npm run hash-password -- <jelszo>");
+  console.error("Usage: npm run hash-password -- <password>");
   process.exit(1);
 }
 

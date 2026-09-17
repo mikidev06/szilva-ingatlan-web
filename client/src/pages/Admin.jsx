@@ -46,8 +46,8 @@ export default function Admin() {
   const [formError, setFormError] = useState(null);
 
   const [appointments, setAppointments] = useState([]);
-  // Igazra inditjuk, hogy elso megnyitaskor ne villanjon fel tevesen az
-  // "ures" allapot, mielott a tenyleges lekerdezes lefutna.
+  // Initialized to true so that the "empty" state does not incorrectly flash
+  // up on first open, before the actual query has run.
   const [loadingAppointments, setLoadingAppointments] = useState(true);
   const [appointmentsError, setAppointmentsError] = useState(null);
 

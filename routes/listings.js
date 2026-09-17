@@ -13,9 +13,9 @@ const ITEM_CACHE_TTL = 300;
 const listCacheKey = (kind) => `listings:all:${kind || "any"}`;
 const itemCacheKey = (id) => `listings:${id}`;
 
-// A szelso ertekeket (min/max) az egyes lakasok adataibol szamitjuk, a
-// nullat/uresen hagyott ertekeket figyelmen kivul hagyva (meg nincsenek
-// kitoltve).
+// The extremes (min/max) are computed from the data of the individual
+// apartments, ignoring zero/empty values (those have not been filled in
+// yet).
 function computeRange(values) {
   const valid = values.filter((v) => v > 0);
   if (valid.length === 0) return null;
@@ -31,8 +31,8 @@ function buildUnits(rawUnits) {
   }));
 }
 
-// Az adott listing (es projekt eseten az osszes lakasa) fenykepeinek
-// egyetlen, lapos listaja - Blob-torleshez hasznaljuk.
+// A single flat list of the photos of the given listing (and, for a project,
+// of all its apartments) - used for deleting blobs.
 function collectAllImages(listing) {
   const unitImages = (listing.units || []).flatMap((u) => u.images || []);
   return [...(listing.images || []), ...unitImages];
@@ -44,10 +44,11 @@ function buildListingData(body) {
   const roomsMax = Number(body.roomsMax) || 0;
   const units = kind === "projekt" ? buildUnits(body.units) : [];
 
-  // Ha vannak lakasok, a projekt ar-/alapterulet-savja mindig ezekbol
-  // szamitodik. Ha meg nincs egy lakas sem kitoltve (pl. regi, a lakas-
-  // bontas elotti projekt szerkesztese), a bekuldott priceMin/Max/sizeMin/
-  // Max ertekekre esunk vissza, hogy a meglevo adat ne vesszen el.
+  // If there are apartments, the project's price/floor-area range is always
+  // computed from them. If not a single apartment has been filled in yet
+  // (e.g. editing an old project from before the apartment breakdown), we
+  // fall back to the submitted priceMin/Max/sizeMin/Max values so that the
+  // existing data is not lost.
   const priceRange = computeRange(units.map((u) => u.price));
   const sizeRange = computeRange(units.map((u) => u.size));
   const priceMin = priceRange ? priceRange.min : Number(body.priceMin) || 0;
@@ -78,12 +79,12 @@ function buildListingData(body) {
   };
 }
 
-// POST /api/listings/blob-upload - kepfeltoltesi token generalasa a bongeszo
-// szamara, hogy a fenykepek kozvetlenul a Vercel Blob-ba toltodjenek fel
-// (megkerulve a szerverless fuggvenyek 4.5 MB-os kerestest-meret korlatjat).
-// Az admin JWT-t a clientPayload-ban kapja, mert ezt a vegpontot a Vercel
-// Blob sajat "feltoltes kesz" callback-je is meghivja, ami nem hordozza a mi
-// Authorization fejlecunket.
+// POST /api/listings/blob-upload - issues an image upload token for the
+// browser, so that the photos are uploaded straight to Vercel Blob (bypassing
+// the 4.5 MB request size limit of serverless functions). It receives the
+// admin JWT in the clientPayload, because this endpoint is also called by
+// Vercel Blob's own "upload completed" callback, which does not carry our
+// Authorization header.
 router.post("/blob-upload", async (req, res) => {
   try {
     const jsonResponse = await handleUpload({
@@ -111,8 +112,9 @@ router.post("/blob-upload", async (req, res) => {
         };
       },
       onUploadCompleted: async () => {
-        // Nincs szukseg extra logikara: a kliens a feltoltes vegen kapott
-        // URL-t maga menti el az ingatlanhoz a szokasos POST/PUT keresen at.
+        // No extra logic needed: at the end of the upload the client saves
+        // the returned URL to the listing itself via the usual POST/PUT
+        // request.
       },
     });
 
@@ -122,8 +124,8 @@ router.post("/blob-upload", async (req, res) => {
   }
 });
 
-// GET /api/listings?kind=ingatlan|projekt - ingatlanok/projektek lekerese
-// (cache-elve). Kind nelkul mindkettot visszaadja.
+// GET /api/listings?kind=ingatlan|projekt - fetch properties/projects
+// (cached). Without kind it returns both.
 router.get("/", async (req, res) => {
   try {
     const kind = req.query.kind === "projekt" || req.query.kind === "ingatlan" ? req.query.kind : null;
@@ -142,7 +144,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/listings/:id - egy ingatlan lekerese (cache-elve)
+// GET /api/listings/:id - fetch a single property (cached)
 router.get("/:id", async (req, res) => {
   try {
     const key = itemCacheKey(req.params.id);
@@ -164,8 +166,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /api/listings - uj ingatlan letrehozasa (admin). A kepek mar korabban
-// feltoltodtek a Vercel Blob-ba, itt csak a vegleges URL-eket kapjuk meg.
+// POST /api/listings - create a new property (admin). The images have already
+// been uploaded to Vercel Blob, here we only receive the final URLs.
 router.post("/", requireAuth, async (req, res) => {
   try {
     const listing = await Listing.create(buildListingData(req.body));
@@ -176,9 +178,9 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
-// PUT /api/listings/:id - ingatlan modositasa (admin). A torolt kepeket a
-// regi es az uj images lista kulonbsegebol allapitjuk meg, es toroljuk a
-// Blob-bol.
+// PUT /api/listings/:id - update a property (admin). Deleted images are
+// determined from the difference between the old and the new images list, and
+// removed from Blob.
 router.put("/:id", requireAuth, async (req, res) => {
   try {
     const existing = await Listing.findById(req.params.id);
@@ -204,7 +206,7 @@ router.put("/:id", requireAuth, async (req, res) => {
   }
 });
 
-// DELETE /api/listings/:id - ingatlan es kepeinek torlese (admin)
+// DELETE /api/listings/:id - delete a property and its images (admin)
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const listing = await Listing.findByIdAndDelete(req.params.id);

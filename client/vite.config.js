@@ -7,8 +7,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // A react/react-router ritkan valtozik, sajat chunkban marad, igy egy
-        // uj deploy utan is a bongeszo gyorsitotarabol jon.
+        // react/react-router rarely changes, so it stays in its own chunk and
+        // still comes from the browser cache after a new deploy.
         manualChunks(id) {
           if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(id)) {
             return 'vendor'

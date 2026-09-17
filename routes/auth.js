@@ -5,9 +5,9 @@ import requireAuth from "../middleware/auth.js";
 
 const router = Router();
 
-// POST /api/auth/login - admin bejelentkezes jelszoval. A jelszo bcrypt
-// hash-kent van tarolva az ADMIN_PASSWORD_HASH kornyezeti valtozoban (nem
-// sima szovegkent), lasd: scripts/hashPassword.mjs.
+// POST /api/auth/login - admin login with a password. The password is stored
+// as a bcrypt hash in the ADMIN_PASSWORD_HASH environment variable, not as
+// plain text, see: hashPassword.mjs.
 router.post("/login", async (req, res) => {
   const { password } = req.body;
 
@@ -29,7 +29,7 @@ router.post("/login", async (req, res) => {
   res.json({ token });
 });
 
-// GET /api/auth/verify - token ervenyesseg ellenorzese
+// GET /api/auth/verify - check whether a token is still valid
 router.get("/verify", requireAuth, (req, res) => {
   res.json({ valid: true });
 });

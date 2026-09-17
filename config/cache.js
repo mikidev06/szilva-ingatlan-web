@@ -1,12 +1,12 @@
-// Egyszerű, folyamaton belüli (in-memory) TTL cache. Nincs szüksége külön
-// szolgáltatásra (pl. Redis-re) - egyetlen szerverpéldányon fut, a tárolt
-// adatok a szerver újraindításakor elvesznek. Egy ilyen kis oldal olvasás-
-// intenzív végpontjaihoz (ingatlanok listázása) ez bőven elegendő.
+// Simple in-process (in-memory) TTL cache. Needs no separate service (such
+// as Redis) - it runs inside a single server instance, and the cached data is
+// lost when the server restarts. For the read-heavy endpoints of a small site
+// like this one (listing properties) that is more than enough.
 
 const store = new Map();
 
 export function connectCache() {
-  console.log("In-memory cache aktiv (nincs kulso Redis fuggoseg).");
+  console.log("In-memory cache active (no external Redis dependency).");
 }
 
 export function cacheGet(key) {

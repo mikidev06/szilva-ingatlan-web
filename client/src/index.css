@@ -69,20 +69,20 @@
 
 * {
   box-sizing: border-box;
-  /* Sima szinatmenet temavaltaskor (vilagos/sotet mod), hogy az oldal
-     ne "ugorjon", hanem lagyan valtson szint. Ez a tartalek olyan
-     bongeszokben, amik nem tamogatjak a lent bekapcsolt kor alaku
-     "reveal" animaciot (lasd theme.js setThemeWithTransition). */
+  /* A smooth color transition on theme change (light/dark mode), so the page
+     does not "jump" but shifts colors gently. This is the fallback in
+     browsers that do not support the circular "reveal" animation enabled
+     below (see theme.js setThemeWithTransition). */
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Temavalto kor-reveal animacio: a bongeszo alapertelmezett
-   keresztuszasat kikapcsoljuk, es helyette CSS kulcskockakkal (nem
-   JS-bol, kesobb inditott animate()-tel) noveljuk a kort a valto
-   gombtol - igy az animacio mar az elso kirajzolt framen a "0px"
-   allapotbol indul, nincs egy pillanatnyi res, amiben a leplezetlen
-   uj tema felvillanna, mielott a kor animacioja elkezdodne (lasd
-   theme.js setThemeWithTransition). */
+/* Theme-switch circular reveal animation: we turn off the browser's default
+   cross-fade and instead grow the circle from the toggle button with CSS
+   keyframes (not with an animate() call started later from JS) - that way the
+   animation begins from its "0px" state on the very first rendered frame, and
+   there is no momentary gap in which the unmasked new theme would flash up
+   before the circle animation starts (see theme.js
+   setThemeWithTransition). */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root) {
     animation: none;
@@ -614,7 +614,7 @@ button {
   gap: 5px;
 }
 
-/* Projekt lakasai (ProjectDetail) */
+/* Apartments of a project (ProjectDetail) */
 
 .unit-grid {
   display: grid;
@@ -895,8 +895,8 @@ button {
   height: 100%;
   border: 0;
   display: block;
-  /* Amig az overlay aktiv (nincs ratkattintva), a terkep nem fogja el a
-     gorgetest/egeret - csak kattintas utan valik interaktivva. */
+  /* While the overlay is active (not yet clicked), the map does not capture
+     scrolling/the mouse - it only becomes interactive after a click. */
   pointer-events: none;
 }
 
@@ -1043,7 +1043,7 @@ button {
   color: #fff;
 }
 
-/* Legal / hosszú szöveges oldalak (pl. adatvédelmi tájékoztató) */
+/* Legal / long-form text pages (the privacy notice, for instance) */
 
 .legal-content {
   max-width: 760px;
@@ -1945,7 +1945,7 @@ button {
   }
 }
 
-/* Booking / naptár */
+/* Booking / calendar */
 
 .booking-layout {
   display: grid;

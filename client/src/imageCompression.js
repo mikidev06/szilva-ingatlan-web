@@ -1,10 +1,10 @@
 const MAX_DIMENSION = 1920;
 const JPEG_QUALITY = 0.85;
 
-// Lekicsinyiti a kepet ugy, hogy a hosszabb oldala ne legyen nagyobb, mint
-// MAX_DIMENSION (az aranyok megtartasaval, vagas nelkul), majd JPEG-kent
-// tomoriti. Igy minden feltoltott fenykep hasonlo, kezelheto meretu lesz,
-// meg mielott elhagyna a bongeszot.
+// Scales the image down so that its longer side is no larger than
+// MAX_DIMENSION (keeping the aspect ratio, without cropping), then compresses
+// it as JPEG. This way every uploaded photo ends up at a similar, manageable
+// size before it even leaves the browser.
 export async function compressImage(file) {
   try {
     const bitmap = await createImageBitmap(file);
@@ -32,8 +32,8 @@ export async function compressImage(file) {
     const newName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
     return new File([blob], newName, { type: "image/jpeg" });
   } catch (err) {
-    // Ha a tomorites bármiért nem sikerul (pl. a bongeszo nem tamogatja),
-    // az eredeti fajlt toltjuk fel valtoztatas nelkul.
+    // If the compression fails for any reason (the browser does not support
+    // it, for instance), we upload the original file unchanged.
     return file;
   }
 }

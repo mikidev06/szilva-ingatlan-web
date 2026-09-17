@@ -24,10 +24,10 @@ function emptyUnit() {
   return { price: "", size: "", existingImages: [], uploads: [] };
 }
 
-// Ha a projektnek mar vannak reszletezett lakasai, azokbol inditunk.
-// Regi, lakas-bontas elotti projekt szerkesztesekor a mar megadott
-// "szabad lakasok" szamahoz ures sorokat keszitunk, hogy at lehessen
-// migralni a reszletes adatokra.
+// If the project already has itemized apartments, we start from those. When
+// editing an old project from before the apartment breakdown, we create empty
+// rows to match the already given number of "available apartments", so the
+// data can be migrated to the itemized format.
 function buildInitialUnits(initial) {
   if (!initial) return [];
   if (Array.isArray(initial.units) && initial.units.length > 0) {
@@ -87,10 +87,10 @@ export default function AdminListingForm({ initial, token, onSubmit, onCancel, s
     }));
   }
 
-  // A "Szabad lakások" mezo erteke hatarozza meg, hany lakas-sor jelenjen
-  // meg alatta: novelesnel ures sorok kerulnek a vegere, csokkentesnel a
-  // vegerol tunnek el (a mar feltoltott, de levagott sorok kepeinek
-  // preview URL-jet felszabaditjuk).
+  // The value of the "Szabad lakások" field decides how many apartment rows
+  // appear below it: on increase, empty rows are appended; on decrease, rows
+  // are dropped from the end (and the preview URLs of the images of any
+  // already uploaded but truncated rows are released).
   function handleAvailableUnitsChange(e) {
     const value = e.target.value;
     setForm((prev) => ({ ...prev, availableUnits: value }));

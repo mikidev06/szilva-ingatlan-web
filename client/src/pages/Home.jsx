@@ -27,10 +27,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
-  // Az onallo ingatlanok es a projekteken beluli, egyedi lakasok egyutt
-  // szamitott, elo darabszama a hero statisztikahoz (nem a projektek
-  // darabszama, hanem a bennuk levo lakasoke). Null, amig meg nem all
-  // rendelkezesre mindket lekeres eredmenye.
+  // The live combined count of standalone properties and of the individual
+  // apartments inside projects, for the hero statistic (not the number of
+  // projects, but of the apartments within them). Null until the results of
+  // both queries are available.
   const [totalCount, setTotalCount] = useState(null);
 
   useEffect(() => {

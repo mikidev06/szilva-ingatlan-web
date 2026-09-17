@@ -41,7 +41,7 @@ export default function Calendar({ selectedDate, onSelectDate }) {
   }, [year, month]);
 
   const firstOfMonth = new Date(year, month, 1);
-  const firstWeekday = (firstOfMonth.getDay() + 6) % 7; // 0 = hétfő
+  const firstWeekday = (firstOfMonth.getDay() + 6) % 7; // 0 = Monday
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const cells = [];

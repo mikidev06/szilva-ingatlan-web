@@ -4,10 +4,10 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 
-// A kezdolap a fo csomagban marad (ide erkezik a latogatok tobbsege), a tobbi
-// oldal viszont csak akkor toltodik le, amikor tenylegesen odanavigalnak.
-// Az admin feluletet (urlap + kepfeltolto + Vercel Blob kliens) igy a
-// nyilvanos latogatok soha nem toltik le.
+// The home page stays in the main bundle (that is where most visitors land),
+// while the other pages are only downloaded once someone actually navigates to
+// them. This also means public visitors never download the admin UI (form +
+// image uploader + Vercel Blob client).
 const Listings = lazy(() => import("./pages/Listings"));
 const ListingDetail = lazy(() => import("./pages/ListingDetail"));
 const Projects = lazy(() => import("./pages/Projects"));

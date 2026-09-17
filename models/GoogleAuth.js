@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 
-// Egyetlen dokumentum tarolja Szilvia Google Naptar hozzaferesenek
-// tokenjeit - egyetlen adminja van az oldalnak, tobb felhasznalos
-// tarolasra nincs szukseg.
+// A single document holds the tokens for Szilvia's Google Calendar access -
+// the site has exactly one admin, so per-user storage is not needed.
 const googleAuthSchema = new mongoose.Schema(
   {
     refreshToken: { type: String, required: true },

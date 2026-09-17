@@ -1,7 +1,7 @@
-/* Sajat kiszolgalasu betutipusok (Inter + Playfair Display), csak a
-   latin es latin-ext subsetekkel - a magyar ekezetes karakterekhez ez
-   eleg. Igy elmarad a Google Fonts fele iranyulo, rendereles-blokkolo
-   kereses + kapcsolatepites az oldalbetoltes kritikus utjarol. */
+/* Self-hosted fonts (Inter + Playfair Display), with the latin and latin-ext
+   subsets only - that is enough for the Hungarian accented characters. This
+   keeps the render-blocking DNS lookup + connection setup towards Google Fonts
+   off the critical path of the page load. */
 
 @font-face {
   font-family: 'Inter';

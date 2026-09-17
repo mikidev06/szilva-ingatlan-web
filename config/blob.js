@@ -8,6 +8,6 @@ export async function deleteImages(urls = []) {
   try {
     await del(blobUrls);
   } catch (err) {
-    // A blob torlese nem szabad, hogy megallitsa a kiszolgalast.
+    // A failed blob deletion must never take the request down with it.
   }
 }

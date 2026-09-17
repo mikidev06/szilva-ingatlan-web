@@ -1,12 +1,12 @@
-// Nyitvatartas: hetfo-pentek, 9:00-18:00, oras idopontokkal (utolso kezdes 17:00).
+// Opening hours: Monday-Friday, 9:00-18:00, in whole-hour slots (last start 17:00).
 export const BUSINESS_HOUR_SLOTS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
 
-// A "YYYY-MM-DD" datumot mindig UTC-kent ertelmezzuk, es getUTCDay()-jal
-// olvassuk ki a het napjat, hogy a szerver sajat idozonaja (pl. Vercelen UTC)
-// soha ne csusztassa el a napot egy nappal.
+// The "YYYY-MM-DD" date is always interpreted as UTC, and the day of the week
+// is read with getUTCDay(), so that the server's own time zone (UTC on Vercel,
+// for instance) can never shift the day by one.
 export function isBusinessDay(dateStr) {
   if (!DATE_RE.test(dateStr)) return false;
   const day = new Date(`${dateStr}T00:00:00Z`).getUTCDay();
@@ -21,10 +21,10 @@ export function isValidSlot(dateStr, timeStr) {
   return minute === "00" && BUSINESS_HOUR_SLOTS.includes(hour);
 }
 
-// A "YYYY-MM-DD" + oraszam parost RFC3339 idobelyeggé alakitja a
-// budapesti idozona tenyleges (nyari/teli) UTC-eltolasaval, hogy a Google
-// Naptar API-hoz mindig a helyes pillanatot kuldjuk - fuggetlenul attol,
-// hogy a szerver sajat idozonaja mit mutat.
+// Converts a "YYYY-MM-DD" + hour pair into an RFC3339 timestamp using the
+// actual (summer/winter) UTC offset of the Budapest time zone, so that we
+// always send the correct instant to the Google Calendar API - regardless of
+// what the server's own time zone says.
 export function budapestISO(dateStr, hour) {
   const probe = new Date(`${dateStr}T12:00:00Z`);
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -40,15 +40,15 @@ export function budapestISO(dateStr, hour) {
   if (hour < 24) {
     return `${dateStr}T${String(hour).padStart(2, "0")}:00:00${sign}${abs}:00`;
   }
-  // hour >= 24: a kovetkezo nap 00:00-ja (honap-hatarokhoz).
+  // hour >= 24: 00:00 of the next day (for month boundaries).
   const next = new Date(`${dateStr}T00:00:00Z`);
   next.setUTCDate(next.getUTCDate() + 1);
   const nextDateStr = next.toISOString().slice(0, 10);
   return `${nextDateStr}T00:00:00${sign}${abs}:00`;
 }
 
-// Egy adott nap adott orai slotja (hour:00 - hour+1:00) es a Google
-// busy-intervallumok atfedeset vizsgalja.
+// Checks whether a given hourly slot of a given day (hour:00 - hour+1:00)
+// overlaps with the Google busy intervals.
 export function slotOverlapsBusy(dateStr, hour, busyIntervals) {
   if (!busyIntervals || busyIntervals.length === 0) return false;
   const slotStart = new Date(budapestISO(dateStr, hour));

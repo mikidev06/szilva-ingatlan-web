@@ -14,7 +14,7 @@ const messagesLimiter = rateLimit({
   message: { message: "Tul sok uzenet, kerjuk probald ujra kesobb." },
 });
 
-// POST /api/messages - kapcsolatfelveteli uzenet mentese (nyilvanos)
+// POST /api/messages - store a contact message (public)
 router.post("/", messagesLimiter, async (req, res) => {
   try {
     const { name, email, message, phone } = req.body;
@@ -36,7 +36,7 @@ router.post("/", messagesLimiter, async (req, res) => {
   }
 });
 
-// GET /api/messages - osszes uzenet listazasa (admin)
+// GET /api/messages - list all messages (admin)
 router.get("/", requireAuth, async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
@@ -47,7 +47,7 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
-// DELETE /api/messages/:id - uzenet torlese (admin)
+// DELETE /api/messages/:id - delete a message (admin)
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const message = await Message.findByIdAndDelete(req.params.id);

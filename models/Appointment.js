@@ -17,8 +17,8 @@ const appointmentSchema = new mongoose.Schema(
       enum: ["Személyes találkozó", "Hitelügyintézés"],
       required: true,
     },
-    // Helyi (magyar) naptari datum es ido, kulon sztringkent tarolva, hogy
-    // elkerulje az idozona-atszamitasi hibakat a szerver es a bongeszo kozott.
+    // Local (Hungarian) calendar date and time, stored as separate strings to
+    // avoid time zone conversion errors between the server and the browser.
     date: {
       type: String,
       required: true,

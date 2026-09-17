@@ -25,7 +25,7 @@ export function setTheme(theme) {
   try {
     localStorage.setItem(STORAGE_KEY, theme);
   } catch {
-    // pl. privát böngészés - a valasztas ekkor csak a munkamenetre ervenyes
+    // e.g. private browsing - the choice then only applies to this session
   }
   applyTheme(theme);
 }
@@ -37,11 +37,12 @@ export function bootstrapTheme() {
   }
 }
 
-// Temavaltas egy kort noveszto "reveal" animacioval, ami a valto gombtol
-// indul es az egesz oldalt lefedi - a View Transitions API-val, mert az a
-// teljes oldalt pillanatkepkent kezeli, igy a hatterszinek mellett a
-// CSS valtozokbol epulo gradienseket (pl. a hero-szekcio) is szepen,
-// ugras nelkul valtja at, amit egy sima CSS transition nem tudna.
+// Theme switching with a growing circular "reveal" animation that starts at
+// the toggle button and covers the whole page - done with the View Transitions
+// API, because that treats the entire page as a snapshot, so besides the
+// background colors it also cross-fades the gradients built from CSS variables
+// (the hero section, for instance) smoothly, with no jump, which a plain CSS
+// transition could not do.
 export function setThemeWithTransition(theme, origin, onApplied) {
   const reducedMotion =
     typeof window !== "undefined" &&
@@ -61,21 +62,22 @@ export function setThemeWithTransition(theme, origin, onApplied) {
     Math.max(y, window.innerHeight - y)
   );
 
-  // A kor kozeppontjat es vegso sugarat CSS valtozokent adjuk at (nem
-  // document.documentElement.animate()-tel, kesobb) - a
-  // ::view-transition-new(root) csomopont a "theme-reveal" CSS
-  // kulcskocka-animaciot mar a legelso kirajzolt framen a "0px" allapotbol
-  // inditja, igy nincs egy pillanatnyi res, amiben a leplezetlen uj tema
-  // felvillanna, majd a kor animacio inditasakor visszaugrana a regire.
+  // The center and final radius of the circle are passed in as CSS variables
+  // (rather than later, via document.documentElement.animate()) - that way the
+  // ::view-transition-new(root) node starts the "theme-reveal" CSS keyframe
+  // animation from its "0px" state on the very first rendered frame, so there
+  // is no momentary gap in which the unmasked new theme would flash up and
+  // then jump back to the old one as the circle animation starts.
   const root = document.documentElement;
   root.style.setProperty("--theme-reveal-x", `${x}px`);
   root.style.setProperty("--theme-reveal-y", `${y}px`);
   root.style.setProperty("--theme-reveal-r", `${endRadius}px`);
 
-  // onApplied-et (pl. a gomb ikonjat valto React allapotot) is a
-  // callbacken belul, flushSync-kel kell meghivni, kulonben a React
-  // renderelese a "regi"/"uj" pillanatkep felvetele KOZOTT, kulon
-  // frame-ben villanna be - ettol tunt "akadozonak" a valtas.
+  // onApplied (the React state that swaps the button icon, for instance) also
+  // has to be called inside the callback, with flushSync, otherwise React's
+  // render would flash in BETWEEN the capture of the "old" and "new"
+  // snapshots, in a separate frame - which is what made the switch look
+  // "janky".
   const transition = document.startViewTransition(() => {
     setTheme(theme);
     onApplied?.();

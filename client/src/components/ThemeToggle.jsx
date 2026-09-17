@@ -11,9 +11,10 @@ export default function ThemeToggle() {
     const next = isDark ? "light" : "dark";
     const rect = buttonRef.current?.getBoundingClientRect();
     const origin = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null;
-    // A gomb ikonjanak allapotat is a temavaltas atmenetenek "pillanatkep"
-    // hatarain BELUL kell frissiteni (flushSync-kel szinkronban), kulonben
-    // az ikon kicsit korabban villanna at, mint ahogy a kor-reveal elindul.
+    // The state of the button icon also has to be updated INSIDE the
+    // "snapshot" boundaries of the theme transition (synchronously, with
+    // flushSync), otherwise the icon would flip slightly earlier than the
+    // circular reveal starts.
     setThemeWithTransition(next, origin, () => flushSync(() => setThemeState(next)));
   }
 

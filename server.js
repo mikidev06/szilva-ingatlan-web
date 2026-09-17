@@ -26,7 +26,7 @@ const missingEnvVars = requiredEnvVars.filter((name) => !process.env[name]);
 
 if (isProduction && missingEnvVars.length > 0) {
   console.error(
-    `Hianyzo kotelezo kornyezeti valtozok production modban: ${missingEnvVars.join(", ")}`
+    `Missing required environment variables in production mode: ${missingEnvVars.join(", ")}`
   );
   process.exit(1);
 }
@@ -61,7 +61,7 @@ app.use(compression());
 const allowedOrigin = process.env.CLIENT_ORIGIN;
 if (isProduction && !allowedOrigin) {
   console.warn(
-    "Figyelem: nincs beallitva CLIENT_ORIGIN production modban, a CORS minden origint enged."
+    "Warning: CLIENT_ORIGIN is not set in production mode, CORS will allow every origin."
   );
 }
 app.use(cors(allowedOrigin ? { origin: allowedOrigin } : {}));
@@ -110,7 +110,7 @@ app.use((err, req, res, next) => {
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`Szerver fut a http://localhost:${PORT} cimen`);
+    console.log(`Server running at http://localhost:${PORT}`);
   });
 }
 

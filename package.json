@@ -1,7 +1,7 @@
 {
   "name": "szilvia-ingatlan-server",
   "version": "1.0.0",
-  "description": "Szilágyi Szilvia ingatlanos weboldalának backend szervere (Express + MongoDB Atlas)",
+  "description": "Backend server for Szilágyi Szilvia's real estate website (Express + MongoDB Atlas)",
   "main": "server.js",
   "type": "module",
   "scripts": {

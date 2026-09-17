@@ -28,7 +28,7 @@ function urlEntry(loc, lastmod, priority) {
   </url>`;
 }
 
-// GET /sitemap.xml - statikus oldalak es az osszes ingatlan/projekt URL-je
+// GET /sitemap.xml - the static pages and the URLs of every property/project
 router.get("/sitemap.xml", async (req, res) => {
   try {
     const listings = await Listing.find().select("_id kind updatedAt");
@@ -48,7 +48,7 @@ ${[...staticEntries, ...listingEntries].join("\n")}
 
     res.type("application/xml").send(xml);
   } catch (err) {
-    console.error("Sitemap generalasi hiba:", err);
+    console.error("Sitemap generation error:", err);
     res.status(500).type("text/plain").send("Sitemap generalasi hiba.");
   }
 });

@@ -22,8 +22,8 @@ const bookingLimiter = rateLimit({
   message: { message: "Tul sok foglalasi probalkozas, kerjuk probald ujra kesobb." },
 });
 
-// GET /api/appointments/availability?date=YYYY-MM-DD - foglalt idopontok egy
-// napra (nyilvanos, csak az idopontokat adja vissza, szemelyes adatot nem)
+// GET /api/appointments/availability?date=YYYY-MM-DD - the booked slots for
+// one day (public, returns only the times, never personal data)
 router.get("/availability", async (req, res) => {
   try {
     const { date } = req.query;
@@ -34,15 +34,15 @@ router.get("/availability", async (req, res) => {
     const booked = await Appointment.find({ date }).select("time -_id");
     const bookedTimes = new Set(booked.map((b) => b.time));
 
-    // A sajat foglalasok mellett Szilvia Google Naptaraban is megnezzuk,
-    // van-e mar elfoglalt idopontja aznapra - ha a Google lekerdezes
-    // barmiert sikertelen (nincs osszekapcsolva, lejart token, stb.), a
-    // foglalas rendszer akkor is a sajat adatbazisunkkal mukodik tovabb.
+    // Besides our own bookings we also check Szilvia's Google Calendar for
+    // slots already taken that day - if the Google query fails for any reason
+    // (not connected, expired token, etc.), the booking system keeps working
+    // with our own database alone.
     let busyIntervals = [];
     try {
       busyIntervals = await getBusyIntervals(budapestISO(date, 9), budapestISO(date, 18));
     } catch (err) {
-      console.error("Google Naptar freeBusy hiba:", err.message);
+      console.error("Google Calendar freeBusy error:", err.message);
     }
 
     for (const hour of BUSINESS_HOUR_SLOTS) {
@@ -62,9 +62,9 @@ router.get("/availability", async (req, res) => {
   }
 });
 
-// GET /api/appointments/full-days?year=YYYY&month=MM - adott honapban
-// teljesen betelt (minden orai slot foglalt) napok, sajat foglalasok es a
-// Google Naptar egyuttes figyelembevetelevel (nyilvanos)
+// GET /api/appointments/full-days?year=YYYY&month=MM - the days of the given
+// month that are completely full (every hourly slot taken), taking both our
+// own bookings and the Google Calendar into account (public)
 router.get("/full-days", async (req, res) => {
   try {
     const year = Number(req.query.year);
@@ -88,7 +88,7 @@ router.get("/full-days", async (req, res) => {
     try {
       busyIntervals = await getBusyIntervals(budapestISO(start, 0), budapestISO(end, 24));
     } catch (err) {
-      console.error("Google Naptar freeBusy hiba:", err.message);
+      console.error("Google Calendar freeBusy error:", err.message);
     }
 
     const fullDays = [];
@@ -109,7 +109,7 @@ router.get("/full-days", async (req, res) => {
   }
 });
 
-// POST /api/appointments - uj idopontfoglalas (nyilvanos)
+// POST /api/appointments - new appointment booking (public)
 router.post("/", bookingLimiter, async (req, res) => {
   try {
     const { name, email, phone, serviceType, date, time, notes } = req.body;
@@ -130,7 +130,7 @@ router.post("/", bookingLimiter, async (req, res) => {
         return res.status(409).json({ message: "Ez az idopont mar foglalt, valassz masikat." });
       }
     } catch (err) {
-      console.error("Google Naptar freeBusy hiba foglalaskor:", err.message);
+      console.error("Google Calendar freeBusy error while booking:", err.message);
     }
 
     const appointment = await Appointment.create({
@@ -158,7 +158,7 @@ router.post("/", bookingLimiter, async (req, res) => {
         endISO: budapestISO(date, hour + 1),
       });
     } catch (err) {
-      console.error("Google Naptar esemeny letrehozasa sikertelen:", err.message);
+      console.error("Failed to create Google Calendar event:", err.message);
     }
 
     res.status(201).json(appointment);
@@ -167,7 +167,7 @@ router.post("/", bookingLimiter, async (req, res) => {
   }
 });
 
-// GET /api/appointments - osszes foglalas (admin)
+// GET /api/appointments - all bookings (admin)
 router.get("/", requireAuth, async (req, res) => {
   try {
     const appointments = await Appointment.find().sort({ date: 1, time: 1 });
@@ -178,7 +178,7 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
-// DELETE /api/appointments/:id - foglalas lemondasa (admin)
+// DELETE /api/appointments/:id - cancel a booking (admin)
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findByIdAndDelete(req.params.id);
