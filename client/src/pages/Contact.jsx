@@ -110,7 +110,7 @@ export default function Contact() {
             <span className="eyebrow">Elérhetőségek</span>
             <h2>Forduljon hozzám bizalommal</h2>
             <p>
-              Hétköznapokon 9:00 és 18:00 között állok rendelkezésére,
+              Hétfőtől szombatig 9:00 és 18:00 között állok rendelkezésére,
               <br></br>
               de e-mailben bármikor elérhet.
             </p>
@@ -143,7 +143,7 @@ export default function Contact() {
                 <div className="contact-info-icon">🕒</div>
                 <div>
                   <strong>Nyitvatartás</strong>
-                  <span>Hétfő – Péntek: 9:00 – 18:00</span>
+                  <span>Hétfő – Szombat: 9:00 – 18:00</span>
                 </div>
               </div>
             </div>

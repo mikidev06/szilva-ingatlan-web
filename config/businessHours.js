@@ -1,4 +1,4 @@
-// Opening hours: Monday-Friday, 9:00-18:00, in whole-hour slots (last start 17:00).
+// Opening hours: Monday-Saturday, 9:00-18:00, in whole-hour slots (last start 17:00).
 export const BUSINESS_HOUR_SLOTS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -10,7 +10,7 @@ const TIME_RE = /^\d{2}:\d{2}$/;
 export function isBusinessDay(dateStr) {
   if (!DATE_RE.test(dateStr)) return false;
   const day = new Date(`${dateStr}T00:00:00Z`).getUTCDay();
-  return day >= 1 && day <= 5;
+  return day >= 1 && day <= 6; // Monday (1) - Saturday (6), Sunday closed
 }
 
 export function isValidSlot(dateStr, timeStr) {

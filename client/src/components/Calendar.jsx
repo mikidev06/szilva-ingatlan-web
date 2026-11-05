@@ -10,9 +10,9 @@ export function toDateKey(date) {
   return `${y}-${m}-${d}`;
 }
 
-function isWeekend(date) {
-  const day = date.getDay();
-  return day === 0 || day === 6;
+// Bookable Monday-Saturday; only Sunday is closed.
+function isClosedDay(date) {
+  return date.getDay() === 0;
 }
 
 export default function Calendar({ selectedDate, onSelectDate }) {
@@ -86,7 +86,7 @@ export default function Calendar({ selectedDate, onSelectDate }) {
 
           const key = toDateKey(date);
           const isFull = fullDays.has(key);
-          const disabled = date < today || isWeekend(date) || isFull;
+          const disabled = date < today || isClosedDay(date) || isFull;
           const isSelected = selectedDate === key;
 
           return (
